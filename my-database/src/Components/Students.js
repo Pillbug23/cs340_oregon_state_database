@@ -25,7 +25,7 @@ function Student() {
           </button>
           {form == 0 && (
             <>
-              <h1>Add a student enrolled in Oregon State </h1>
+              <h1>Add Student </h1>
               <Row>
                 <Col md={7}>
                   <Form className="form-box">
@@ -37,7 +37,7 @@ function Student() {
                       />
                       <Form.Text style={{ color: "whitesmoke" }}>
                         Please enter the student's 7 digit ID listed on their
-                        profile.
+                        OSU portal.
                       </Form.Text>
                     </Form.Group>
                     <Form.Group className="mb-2">
@@ -50,7 +50,39 @@ function Student() {
                     </Form.Group>
                     <Form.Group className="mb-2">
                       <Form.Label>Gender</Form.Label>
-                      <Form.Control type="text" placeholder="Gender" />
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          name="flexRadioDefault"
+                          id="flexRadioGender"
+                        />
+                        <label class="form-check-label" for="flexRadioGender">
+                          Male
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          name="flexRadioDefault"
+                          id="flexRadioGender"
+                        />
+                        <label class="form-check-label" for="flexRadioGender">
+                          Female
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          name="flexRadioDefault"
+                          id="flexRadioGender"
+                        />
+                        <label class="form-check-label" for="flexRadioGender">
+                          Intersex
+                        </label>
+                      </div>
                     </Form.Group>
                     <Form.Group className="mb-2">
                       <Form.Label>Previous Major</Form.Label>
@@ -87,7 +119,7 @@ function Student() {
                         </label>
                       </div>
                     </Form.Group>
-                    <Button variant="dark" type="submit">
+                    <Button variant="primary" type="submit">
                       Add student
                     </Button>
                   </Form>
@@ -97,7 +129,7 @@ function Student() {
           )}
           {form == 1 && (
             <>
-              <h1>Update a students info </h1>
+              <h1>Update Student </h1>
               <Row>
                 <Col md={7}>
                   <Form className="form-box">
@@ -118,7 +150,39 @@ function Student() {
                     </Form.Group>
                     <Form.Group className="mb-2">
                       <Form.Label>Gender</Form.Label>
-                      <Form.Control type="text" placeholder="Gender" />
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          name="flexRadioDefault"
+                          id="flexRadioGender"
+                        />
+                        <label class="form-check-label" for="flexRadioGender">
+                          Male
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          name="flexRadioDefault"
+                          id="flexRadioGender"
+                        />
+                        <label class="form-check-label" for="flexRadioGender">
+                          Female
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          name="flexRadioDefault"
+                          id="flexRadioGender"
+                        />
+                        <label class="form-check-label" for="flexRadioGender">
+                          Intersex
+                        </label>
+                      </div>
                     </Form.Group>
                     <Form.Group className="mb-2">
                       <Form.Label>Previous Major</Form.Label>
@@ -155,7 +219,7 @@ function Student() {
                         </label>
                       </div>
                     </Form.Group>
-                    <Button variant="dark" type="submit">
+                    <Button variant="primary" type="submit">
                       Update student
                     </Button>
                   </Form>
@@ -165,7 +229,7 @@ function Student() {
           )}
           {form == 2 && (
             <>
-              <h1>Delete a students info </h1>
+              <h1>Delete Student </h1>
               <Row>
                 <Col md={7}>
                   <Form className="form-box">
@@ -179,7 +243,7 @@ function Student() {
                         Please enter the student's ID you want to delete
                       </Form.Text>
                     </Form.Group>
-                    <Button variant="dark" type="submit">
+                    <Button variant="primary" type="submit">
                       Delete student
                     </Button>
                   </Form>
@@ -187,7 +251,7 @@ function Student() {
               </Row>
             </>
           )}
-          <Table striped bordered hover style={{marginTop: "20px"}}>
+          <Table striped bordered hover style={{ marginTop: "20px" }}>
             <thead>
               <tr>
                 <th>studentID#</th>
@@ -202,7 +266,7 @@ function Student() {
                 <td>0472362</td>
                 <td>Mark</td>
                 <td>marky23@oregonstate.edu</td>
-                <td>M</td>
+                <td>Male</td>
                 <td>Philosophy</td>
               </tr>
               <tr>

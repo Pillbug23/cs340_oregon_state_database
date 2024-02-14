@@ -11,6 +11,7 @@ import Container from 'react-bootstrap/Container';
 import { GiBeaver } from "react-icons/gi";
 
 function Navigation() {
+  const [expandbar, setExpandbar] = useState(false);
 
   return (
     <Navbar
@@ -25,6 +26,13 @@ function Navigation() {
         >
           <GiBeaver style={{marginTop: "8px", marginRight: "7px"}}/> Oregon State Database Tracker
         </Navbar.Brand>
+        <Navbar.Toggle
+          aria-controls="responsive-navbar-nav"
+          onClick={() => {
+            setExpandbar(expandbar ? false : "expanded");
+          }}
+        ></Navbar.Toggle>
+        <Navbar.Collapse id="responsive-navbar-nav">
         <Nav.Item >
               <Nav.Link as={Link} to="/" >
                 Home
@@ -60,6 +68,7 @@ function Navigation() {
                 Earnings
               </Nav.Link>
         </Nav.Item>
+        </Navbar.Collapse>
       </Container>
     </Navbar>
   );

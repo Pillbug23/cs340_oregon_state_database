@@ -28,6 +28,10 @@ header {
   font-size: 1.9rem;
 }
 
+.nav-item {
+  margin: 5px 20px;
+}
+
 .nav-link {
   font-weight: 200;
   transition: all 0.3s ease-out 0s;
@@ -71,7 +75,10 @@ header {
 
 .homepage-introduction {
   color: whitesmoke;
-  font-size: 24px;
+  font-size: px;
+  background-color: #252525;
+  padding: 20px;
+  border-radius: 5px;
 }
 
 
@@ -96,6 +103,7 @@ header {
   border-style: solid;
   font-size: 18px;
   padding: 10px 40px;
+  background-color: #252525;
 }
 
 .btn {

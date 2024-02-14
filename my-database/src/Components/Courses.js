@@ -6,6 +6,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import Table from "react-bootstrap/Table";
 
 function Courses() {
   return (
@@ -13,15 +14,15 @@ function Courses() {
         
       <Container fluid className="basic-info" id="course">
         <Container className="content">
-        <h1>Add an Oregon State course </h1>
+        <h1>Add Course </h1>
           <Row>
             <Col md={7}>
               <Form className="form-box">
                 <Form.Group className="mb-2">
-                  <Form.Label> courseID </Form.Label>
+                  <Form.Label> courseNumber </Form.Label>
                   <Form.Control type="text" placeholder="Enter Course ID" />
                   <Form.Text style={{ color: "whitesmoke" }}>
-                    Please enter the three digit course ID.
+                    Please enter the three digit course number.
                   </Form.Text>
                 </Form.Group>
                 <Form.Group className="mb-2">
@@ -40,7 +41,7 @@ function Courses() {
                   </div>
                 </Form.Group>
                 <Form.Group className="mb-5">
-                  <Form.Label>Units</Form.Label>
+                  <Form.Label>Unit</Form.Label>
                   <select class="form-control" id="unit">
                     <option>1</option>
                     <option>2</option>
@@ -48,12 +49,40 @@ function Courses() {
                     <option>4</option>
                   </select>
                 </Form.Group>
-                <Button variant="dark" type="submit">
+                <Button variant="primary" type="submit">
                   Add course
                 </Button>
               </Form>
             </Col>
           </Row>
+          <Table striped bordered hover style={{ marginTop: "20px" }}>
+            <thead>
+              <tr>
+                <th>courseID#</th>
+                <th>Course #</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Unit</th>
+                
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>340</td>
+                <td>Databases</td>
+                <td>"Design, implementation, and management of database systems"</td>
+                <td>4</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>290</td>
+                <td>Web Development</td>
+                <td>"Fundemental development of interactive websites covering HTML,CSS, and JS"</td>
+                <td>4</td>
+              </tr>
+            </tbody>
+          </Table>
         </Container>
       </Container>
     </section>
