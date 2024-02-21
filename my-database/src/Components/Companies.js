@@ -23,7 +23,7 @@ function Companies() {
                 </Form.Group>
                 <Form.Group className="mb-5">
                   <Form.Label>Role</Form.Label>
-                  <Form.Control type="text" placeholder="Role in company..." />
+                  <Form.Control type="text" placeholder="Role in company" />
                 </Form.Group>
                 <Button variant="primary" type="submit">
                   Add company
@@ -42,16 +42,30 @@ function Companies() {
             <tbody>
               <tr>
                 <td>1</td>
-                <td>Datadog</td>
+                <td>Google</td>
                 <td>
-                  Backend Engineer
+                Frontend Software Engineer
                 </td>
               </tr>
               <tr>
                 <td>2</td>
-                <td>General Motors</td>
+                <td>Datadog</td>
                 <td>
-                  Frontend Engineer
+                  Systems Engineer
+                </td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>IBM</td>
+                <td>
+                  Software Tester
+                </td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>Youtube</td>
+                <td>
+                  Security Engineer
                 </td>
               </tr>
             </tbody>

@@ -28,11 +28,12 @@ function Navigation() {
         </Navbar.Brand>
         <Navbar.Toggle
           aria-controls="responsive-navbar-nav"
+          style={{backgroundColor: "#0165E1"}}
           onClick={() => {
             setExpandbar(expandbar ? false : "expanded");
           }}
         ></Navbar.Toggle>
-        <Navbar.Collapse id="responsive-navbar-nav">
+        <Navbar.Collapse id="responsive-navbar-nav" >
         <Nav.Item >
               <Nav.Link as={Link} to="/" >
                 Home
@@ -66,6 +67,11 @@ function Navigation() {
         <Nav.Item >
               <Nav.Link as={Link} to="/earning" >
                 Earnings
+              </Nav.Link>
+        </Nav.Item>
+        <Nav.Item >
+              <Nav.Link as={Link} to="/enrollment" >
+                Enrollments
               </Nav.Link>
         </Nav.Item>
         </Navbar.Collapse>

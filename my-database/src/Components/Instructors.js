@@ -88,25 +88,44 @@ function Instructors() {
                 <th>instructorID#</th>
                 <th>Name</th>
                 <th>Email</th>
+                <th>Gender</th>
                 <th>Qualifications</th>
                 <th>Years Taught</th>
-                
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>1</td>
-                <td>Mark Zuckerberg</td>
-                <td>mzuck@oregonstate.edu</td>
-                <td>"Taught over 10 years of data structures, PhD from Harvard"</td>
-                <td>10</td>
+                <td>Michael Curry</td>
+                <td>m.curry@oregonstate.edu</td>
+                <td>Male</td>
+                <td>Ph.D. in Computer Science, 10+ years of teaching experience at Oregon State (Curry, n.d.)</td>
+                <td>4</td>
               </tr>
               <tr>
                 <td>2</td>
-                <td>Josh Hug</td>
-                <td>jhug@oregonstate.edu</td>
-                <td>"5 years AI research experience at San Jose State"</td>
+                <td>Randy Scovil</td>
+                <td>r.scovil@oregonstate.edu</td>
+                <td>Male</td>
+                <td>Master's in Computer Science, Worked as a SWE at Google for 2 years (Scovil, n.d.)</td>
                 <td>2</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>Doshna Reddy</td>
+                <td>d.reddy@oregonstate.edu</td>
+                <td>Female</td>
+                <td>Ph.D. in Computer Science, Six Years experience as a software engineer
+(Reddy, n.d.)</td>
+                <td>8</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>Jonathan Lee</td>
+                <td>j.lee@oregonstate.edu</td>
+                <td>Male</td>
+                <td>Taught Operating Systems at UC San Diego for 6 years, co-wrote 2 software engineering papers</td>
+                <td>6</td>
               </tr>
             </tbody>
           </Table>

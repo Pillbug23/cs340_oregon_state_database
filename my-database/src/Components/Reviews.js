@@ -9,7 +9,7 @@ import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
 
 function Reviews() {
-  const [form, setForm] = useState(0);
+  const [form, setForm] = useState(null);
 
   return (
     <section>
@@ -18,12 +18,6 @@ function Reviews() {
           <button type="button" class="btn btn-dark" onClick={() => setForm(0)}>
             Add Review
           </button>
-          <button type="button" class="btn btn-dark" onClick={() => setForm(1)}>
-            Update Review
-          </button>
-          <button type="button" class="btn btn-dark" onClick={() => setForm(2)}>
-            Delete Review
-          </button>
           {form == 0 && (
             <>
               <h1>Add Review</h1>
@@ -31,7 +25,7 @@ function Reviews() {
                 <Col md={7}>
                   <Form className="form-box">
                     <Form.Group className="mb-2">
-                      <Form.Label> courseNumber </Form.Label>
+                      <Form.Label> Course Number </Form.Label>
                       <Form.Control
                         type="text"
                         placeholder="Enter Course Number"
@@ -57,7 +51,7 @@ function Reviews() {
                       </Form.Text>
                     </Form.Group>
                     <Form.Group className="mb-5">
-                      <Form.Label>courseReview</Form.Label>
+                      <Form.Label>Course Review</Form.Label>
                       <div class="form-group">
                         <textarea
                           class="form-control"
@@ -157,23 +151,128 @@ function Reviews() {
             <thead>
               <tr>
                 <th>reviewID#</th>
+                <th>Course</th>
                 <th>Course #</th>
                 <th>Rating</th>
                 <th>Review</th>
+                <th>Add</th>
+                <th>Delete</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>1</td>
+                <td>INTRODUCTION TO DATABASES</td>
                 <td>340</td>
-                <td>10</td>
-                <td>"Allowed me to put valuable skills on my resume which led to a job"</td>
+                <td>9</td>
+                <td>
+                  This course provided valuable skills like querying with SQL
+                  and database management that directly helped me secure an
+                  internship.
+                </td>
+                <td>
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    onClick={() => setForm(1)}
+                  >
+                    +
+                  </Button>
+                </td>
+                <td>
+                  <Button
+                    variant="danger"
+                    type="submit"
+                    onClick={() => setForm(2)}
+                  >
+                    X
+                  </Button>
+                </td>
               </tr>
               <tr>
                 <td>2</td>
-                <td>290</td>
+                <td>DATA STRUCTURES</td>
+                <td>261</td>
+                <td>9</td>
+                <td>
+                  While the course content was useful and beneficial to
+                  understanding data structures, I wish there were more
+                  career-oriented and practical projects.
+                </td>
+                <td>
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    onClick={() => setForm(1)}
+                  >
+                    +
+                  </Button>
+                </td>
+                <td>
+                  <Button
+                    variant="danger"
+                    type="submit"
+                    onClick={() => setForm(2)}
+                  >
+                    X
+                  </Button>
+                </td>
+              </tr>
+              <tr>
                 <td>3</td>
-                <td>"Skills outdated with current mark web frameworks"</td>
+                <td>ANALYSIS OF ALGORITHMS</td>
+                <td>325</td>
+                <td>4</td>
+                <td>
+                  The concepts taught in this course are directly helpful for
+                  technical interviews.
+                </td>
+                <td>
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    onClick={() => setForm(1)}
+                  >
+                    +
+                  </Button>
+                </td>
+                <td>
+                  <Button
+                    variant="danger"
+                    type="submit"
+                    onClick={() => setForm(2)}
+                  >
+                    X
+                  </Button>
+                </td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>OPERATING SYSTEMS</td>
+                <td>344</td>
+                <td>3</td>
+                <td>
+                  Good course overall, but I would have hoped there were more
+                  practical projects to add to my resume.
+                </td>
+                <td>
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    onClick={() => setForm(1)}
+                  >
+                    +
+                  </Button>
+                </td>
+                <td>
+                  <Button
+                    variant="danger"
+                    type="submit"
+                    onClick={() => setForm(2)}
+                  >
+                    X
+                  </Button>
+                </td>
               </tr>
             </tbody>
           </Table>
