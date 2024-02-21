@@ -1,21 +1,19 @@
-# cs340_oregon_state_database
-
-# Database Tracker | Oregon State Database Tracker(some flip server)
+# Database Tracker CS340 | Oregon State Database Tracker(some flip server)
 
 # 🛠 Installation and Setup
 Create a folder on your User.
-mkdir example-folder 
+* mkdir example-folder 
 
 Navigate to the folder you want the repository to be cloned into.
 This is your current working directory.
-cd example-folder 
+* cd example-folder 
 
 Clone the repository. 
-git clone https://github.com/Pillbug23/cs340_oregon_state_database.git
+* git clone https://github.com/Pillbug23/cs340_oregon_state_database.git
 
 Navigate to the frontend folder my-database (will be renamed lol)
-cd cs340_oregon_state_database
-cd my-database 
+* cd cs340_oregon_state_database
+* cd my-database 
 
 
 To install dependencies, run npm install
