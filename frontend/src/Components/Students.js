@@ -20,7 +20,7 @@ function Student() {
   // Side effect for loading component after each render
   // Data is loaded once on load 
   useEffect(() => {
-    fetch('http://localhost:4198/student')
+    fetch('http://localhost:4281/student')
       .then(response => response.json())
       .then(data => setStudentData(data))
       .catch(error => console.error('Error fetching data:', error));
@@ -38,12 +38,29 @@ function Student() {
     graduated: 'No'
   });
 
+  const [updateFormData, setUpdateFormData] = useState({
+    studentid: '',
+    name: '',
+    email: '',
+    gender: 'M',
+    company: '1',
+    previousMajor: 'N/A',
+    graduated: 'No'
+  });
+
+
+
   // handleChange arrow function called everytime a field is filled out
   // Destructure e.target which has name,target
   // update state with the previous formData object and new attribute:value pair
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleUpdateChange = (e) => {
+    const { name, value } = e.target;
+    setUpdateFormData({ ...updateFormData, [name]: value });
   };
 
   // Check if any of the fields are empty
@@ -56,6 +73,14 @@ function Student() {
     }
   }
 
+  const checkEmptyUpdate = () => {
+    for (const field in updateFormData) {
+      if (updateFormData[field] === '') {
+        alert('One or more of your fields are still empty. Please fill it out.')
+        return
+      }
+    }
+  }
   // On submit prevent webpage reload and check conditions
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -65,7 +90,7 @@ function Student() {
       return
     }
     try {
-      const response = await fetch('http://localhost:4198/student', {
+      const response = await fetch('http://localhost:4281/student', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -75,7 +100,7 @@ function Student() {
       if (response.ok) {
         // Handle success
         console.log('Student added successfully');
-        fetch('http://localhost:4198/student') 
+        fetch('http://localhost:4281/student') 
           .then(response => response.json())
           .then(data => setStudentData(data))
           .catch(error => console.error('Error fetching data:', error));
@@ -85,15 +110,49 @@ function Student() {
     }
   };
 
+
+  // Update the student table
+
+  const updateStudent = async (e) => {
+    e.preventDefault();
+    checkEmptyUpdate()
+    if (!updateFormData.email.endsWith("@oregonstate.edu")) {
+      setEmailError(true)
+      return
+    }
+    
+    const studentID = updateFormData.studentid;
+
+    try {
+      const response = await fetch(`http://localhost:4281/student/${studentID}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateFormData)
+      });
+      if (response.ok) {
+        // Handle success
+        console.log('Student updated successfully');
+        fetch('http://localhost:4281/student') 
+          .then(response => response.json())
+          .then(data => setStudentData(data))
+          .catch(error => console.error('Error fetching data:', error));
+      }
+    } catch (error) {
+      console.error('Could not update student', error);
+    }
+  };
+
   // The delete operation for the following student table
   const deleteStudent = async (studentID) => {
     try {
-      const response = await fetch(`http://localhost:4198/student/${studentID}`, {
+      const response = await fetch(`http://localhost:4281/student/${studentID}`, {
         method: 'DELETE',
       });
       if (response.ok) {
         console.log('Student deleted successfully');
-        fetch('http://localhost:4198/student') 
+        fetch('http://localhost:4281/student') 
           .then(response => response.json())
           .then(data => setStudentData(data))
           .catch(error => console.error('Error fetching data:', error));
@@ -198,96 +257,76 @@ function Student() {
               <h1>Update Student </h1>
               <Row>
                 <Col md={7}>
-                  <Form className="form-box">
-                    <Form.Group className="mb-2">
-                      <Form.Label> studentID </Form.Label>
+                  <Form className="form-box" onSubmit={updateStudent}>
+                    Fields marked * are required
+                    <Form.Group className="mb-2" style={{ marginTop: "20px" }}>
+                      <Form.Label> studentID* </Form.Label>
                       <Form.Control
                         type="text"
                         placeholder="Enter Student ID"
+                        name="studentid"
+                        value={updateFormData.studentid}
+                        onChange={handleUpdateChange}
                       />
+                      <Form.Text style={{ color: "whitesmoke" }}>
+                        Please enter the student's 6 digit ID listed on their
+                        OSU portal. ex.726382
+                      </Form.Text>
                     </Form.Group>
                     <Form.Group className="mb-2">
-                      <Form.Label>Name</Form.Label>
-                      <Form.Control type="text" placeholder="Name" />
+                      <Form.Label>Name*</Form.Label>
+                      <Form.Control type="text" placeholder="Name" name="name"
+                        value={updateFormData.name}
+                        onChange={handleUpdateChange} />
                     </Form.Group>
                     <Form.Group className="mb-2">
-                      <Form.Label>Email</Form.Label>
-                      <Form.Control type="text" placeholder="Email" />
+                      <Form.Label>Email*</Form.Label>
+                      <Form.Control type="text" placeholder="Email" name="email"
+                        value={updateFormData.email}
+                        onChange={handleUpdateChange} />
                     </Form.Group>
+                    {emailError && (<p>Email needs to end in @oregonstate.edu</p>)}
                     <Form.Group className="mb-2">
-                      <Form.Label>Gender</Form.Label>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input"
-                          type="radio"
-                          name="flexRadioDefault"
-                          id="flexRadioGender"
-                        />
-                        <label class="form-check-label" for="flexRadioGender">
-                          Male
-                        </label>
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input"
-                          type="radio"
-                          name="flexRadioDefault"
-                          id="flexRadioGender"
-                        />
-                        <label class="form-check-label" for="flexRadioGender">
-                          Female
-                        </label>
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input"
-                          type="radio"
-                          name="flexRadioDefault"
-                          id="flexRadioGender"
-                        />
-                        <label class="form-check-label" for="flexRadioGender">
-                          Intersex
-                        </label>
-                      </div>
-                    </Form.Group>
+                      <Form.Label>Gender*</Form.Label>
+                      <Form.Control
+                        as="select"
+                        name="gender"
+                        value={updateFormData.gender}
+                        onChange={handleUpdateChange}
+                      >
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                        <option value="X">Intersex</option>
+                      </Form.Control>
+                      </Form.Group>
                     <Form.Group className="mb-2">
                       <Form.Label>Current Company</Form.Label>
-                      <Form.Control type="text" placeholder="Company" />
+                      <Form.Control as="select" placeholder="Company" name="company"
+                        value={updateFormData.company}
+                        onChange={handleUpdateChange}>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                      </Form.Control>
                     </Form.Group>
                     <Form.Group className="mb-2">
                       <Form.Label>Previous Major</Form.Label>
-                      <Form.Control type="text" placeholder="Major" />
+                      <Form.Control type="text" placeholder="Major" name="previousMajor"
+                        value={updateFormData.previousMajor}
+                        onChange={handleUpdateChange} />
                     </Form.Group>
-                    <Form.Group className="mb-5">
-                      <Form.Label>Graduated?</Form.Label>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input"
-                          type="radio"
-                          name="flexRadioDefault"
-                          id="flexRadioGraduation"
-                        />
-                        <label
-                          class="form-check-label"
-                          for="flexRadioGraduation"
-                        >
-                          Yes
-                        </label>
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input"
-                          type="radio"
-                          name="flexRadioDefault"
-                          id="flexRadioGraduation"
-                        />
-                        <label
-                          class="form-check-label"
-                          for="flexRadioGraduation"
-                        >
-                          No
-                        </label>
-                      </div>
+                    <Form.Group className="mb-2">
+                      <Form.Label>Graduated? (Yes/No)</Form.Label>
+                      <Form.Control
+                        as="select"
+                        name="graduated"
+                        value={updateFormData.graduated}
+                        onChange={handleUpdateChange}
+                      >
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                      </Form.Control>
                     </Form.Group>
                     <Button variant="primary" type="submit">
                       Update student
