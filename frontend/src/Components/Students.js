@@ -12,6 +12,7 @@ function Student() {
   // The form state which decides which form is filled out.
   // For example clicking on add makes form 1, update makes form 2.
   const [form, setForm] = useState(false);
+  const [updateform, setUpdateForm] = useState(false);
   // The student data which is pulled for the backend 
   const [students, setStudentData] = useState([]);
   // The email error which is a boolean state
@@ -20,7 +21,7 @@ function Student() {
   // Side effect for loading component after each render
   // Data is loaded once on load 
   useEffect(() => {
-    fetch('http://localhost:4281/student')
+    fetch('http://localhost:4283/student')
       .then(response => response.json())
       .then(data => setStudentData(data))
       .catch(error => console.error('Error fetching data:', error));
@@ -48,7 +49,11 @@ function Student() {
     graduated: 'No'
   });
 
-
+  const changeForms = () => {
+    setForm(false)
+    setUpdateForm(!updateform)
+    return
+  }
 
   // handleChange arrow function called everytime a field is filled out
   // Destructure e.target which has name,target
@@ -90,7 +95,7 @@ function Student() {
       return
     }
     try {
-      const response = await fetch('http://localhost:4281/student', {
+      const response = await fetch('http://localhost:4283/student', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -100,7 +105,7 @@ function Student() {
       if (response.ok) {
         // Handle success
         console.log('Student added successfully');
-        fetch('http://localhost:4281/student') 
+        fetch('http://localhost:4283/student') 
           .then(response => response.json())
           .then(data => setStudentData(data))
           .catch(error => console.error('Error fetching data:', error));
@@ -124,7 +129,7 @@ function Student() {
     const studentID = updateFormData.studentid;
 
     try {
-      const response = await fetch(`http://localhost:4281/student/${studentID}`, {
+      const response = await fetch(`http://localhost:4283/student/${studentID}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -134,7 +139,7 @@ function Student() {
       if (response.ok) {
         // Handle success
         console.log('Student updated successfully');
-        fetch('http://localhost:4281/student') 
+        fetch('http://localhost:4283/student') 
           .then(response => response.json())
           .then(data => setStudentData(data))
           .catch(error => console.error('Error fetching data:', error));
@@ -147,12 +152,12 @@ function Student() {
   // The delete operation for the following student table
   const deleteStudent = async (studentID) => {
     try {
-      const response = await fetch(`http://localhost:4281/student/${studentID}`, {
+      const response = await fetch(`http://localhost:4283/student/${studentID}`, {
         method: 'DELETE',
       });
       if (response.ok) {
         console.log('Student deleted successfully');
-        fetch('http://localhost:4281/student') 
+        fetch('http://localhost:4283/student') 
           .then(response => response.json())
           .then(data => setStudentData(data))
           .catch(error => console.error('Error fetching data:', error));
@@ -252,7 +257,7 @@ function Student() {
               </Row>
             </>
           )}
-          {form == 1 && (
+          {updateform == 1 && (
             <>
               <h1>Update Student </h1>
               <Row>
@@ -269,8 +274,8 @@ function Student() {
                         onChange={handleUpdateChange}
                       />
                       <Form.Text style={{ color: "whitesmoke" }}>
-                        Please enter the student's 6 digit ID listed on their
-                        OSU portal. ex.726382
+                        Please enter the student's 6 digit ID THAT MATCHES the below
+                        table for the row you want to update.
                       </Form.Text>
                     </Form.Group>
                     <Form.Group className="mb-2">
@@ -360,7 +365,7 @@ function Student() {
                 <td>{student.previousMajor}</td>
                 <td>{student.graduated}</td>
                 <td>
-                  <Button variant="primary" type="submit" onClick={() => setForm(1)}>
+                  <Button variant="primary" type="submit" onClick={() => changeForms()}>
                     +
                   </Button>
                 </td>

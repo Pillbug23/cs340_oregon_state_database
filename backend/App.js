@@ -14,7 +14,7 @@ const pool = mysql.createPool({
 
 var express = require('express');   // We are using the express library for the web server
 var app     = express();            // We need to instantiate an express object to interact with the server in our code
-PORT        = 4281;                 // Set a port number at the top so it's easy to change in the future
+PORT        = 4283;                 // Set a port number at the top so it's easy to change in the future
 
 // Handlebars
 const { engine } = require('express-handlebars');
@@ -67,12 +67,13 @@ app.get('/student', (req, res) => {
 // Update Student
 
 app.put("/student/:studentID", (req, res) => {
-  const { studentName, studentEmail, studentGender, companyID, previousMajor, graduated } = req.body;
+  const { name, email, gender, company, previousMajor, graduated } = req.body;
   const studentID = req.params.studentID;
+  
   const q = `UPDATE Students SET studentName = ?, studentEmail = ?, studentGender = ?, companyID = ?, 
              previousMajor = ?, graduated = ? WHERE studentID = ?`;
 
-  pool.query(q, [studentName, studentEmail, studentGender, companyID, previousMajor, graduated, studentID], (err, result) => {
+  pool.query(q, [name, email, gender, company, previousMajor, graduated, studentID], (err, result) => {
     if (err) {
       console.error('Error updating student:', err);
       res.status(500).json({ error: 'Failed to update student' });
