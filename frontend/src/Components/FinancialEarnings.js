@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 /*Import components from react-bootstrap */
 import Container from "react-bootstrap/Container";
@@ -7,72 +7,304 @@ import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
+import InputGroup from 'react-bootstrap/InputGroup';
+import { getOverlayDirection } from "react-bootstrap/esm/helpers";
 
 function FinancialEarnings() {
-  const [form, setForm] = useState(null);
+  const [form, setForm] = useState(false);
+  const [updateform, setUpdateForm] = useState(false);
+  // The review data which is pulled for the backend 
+  const [earnings, setEarningData] = useState([]);
+  // The review data which is pulled for the backend 
+  const [students, setStudentData] = useState([]);
+  // The email error which is a boolean state
+  const [emailError, setEmailError] = useState(false)
+
+  // Side effect for loading component after each render
+  // Data is loaded once on load 
+  useEffect(() => {
+    fetch('http://flip4.engr.oregonstate.edu:4283/earning')
+      .then(response => response.json())
+      .then(data => setEarningData(data))
+      .catch(error => console.error('Error fetching data:', error));
+  }, []);
+
+  // Side effect for loading component after each render
+  // Data is loaded once on load 
+  useEffect(() => {
+    fetch('http://flip4.engr.oregonstate.edu:4283/student')
+      .then(response => response.json())
+      .then(data => setStudentData(data))
+      .catch(error => console.error('Error fetching data:', error));
+  }, []);
+
+  // Form data which is a useState object
+  // Note some fields are set to the default values if not selected
+  const [formData, setFormData] = useState({
+    prev: '1',
+    tuition: '1',
+    loan: '1',
+    misc: '1',
+    interest: '1',
+    studentID: '',
+    current: '1'
+  });
+
+  const [updateFormData, setUpdateFormData] = useState({
+    earningID: '',
+    prev: '1',
+    tuition: '1',
+    loan: '1',
+    misc: '1',
+    interest: '1',
+    studentID: '',
+    current: '1'
+  });
+
+  const changeForms = (earning) => {
+    setForm(false)
+    setUpdateForm(!updateform)
+    setUpdateFormData({
+      earningID: earning.earningsID,
+      prev: earning.priorSalary,
+      tuition: earning.tuitionCost,
+      loan: earning.studentLoan,
+      misc: earning.miscExpense,
+      interest: earning.loanInterest,
+      studentID: earning.studentID,
+      current: earning.newSalary
+    })
+    return
+  }
+
+  // handleChange arrow function called everytime a field is filled out
+  // Destructure e.target which has name,target
+  // update state with the previous formData object and new attribute:value pair
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleUpdateChange = (e) => {
+    const { name, value } = e.target;
+    setUpdateFormData({ ...updateFormData, [name]: value });
+  };
+
+  // On submit prevent webpage reload and check conditions
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    checkEmpty()
+
+    try {
+      const response = await fetch('http://flip4.engr.oregonstate.edu:4283/earning', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+      if (response.ok) {
+        // Handle success
+        console.log('Earning added successfully');
+        fetch('http://flip4.engr.oregonstate.edu:4283/earning')
+          .then(response => response.json())
+          .then(data => setEarningData(data))
+          .catch(error => console.error('Error fetching data:', error));
+      }
+    } catch (error) {
+      console.error('Could not add earning', error);
+    }
+  };
+
+  const checkEmptyUpdate = () => {
+    for (const field in updateFormData) {
+      if (updateFormData[field] === '') {
+        alert('One or more of your fields are still empty. Please fill it out.')
+        return
+      }
+    }
+  }
+
+  const updateEarning = async (e) => {
+    e.preventDefault();
+    checkEmptyUpdate()
+
+    const earningID = updateFormData.earningID;
+
+    try {
+      const response = await fetch(`http://flip4.engr.oregonstate.edu:4283/earning/${earningID}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateFormData)
+      });
+      if (response.ok) {
+        // Handle success
+        fetch('http://flip4.engr.oregonstate.edu:4283/earning')
+          .then(response => response.json())
+          .then(data => setEarningData(data))
+          .catch(error => console.error('Error fetching data:', error));
+        setUpdateForm(!updateform)
+      }
+    } catch (error) {
+      console.error('Could not update earning', error);
+    }
+  };
+
+  // Check if any of the fields are empty
+  const checkEmpty = () => {
+    for (const field in formData) {
+      if (formData[field] === '') {
+        console.log(formData[field])
+        alert('One or more of your fields are still empty or you have a foreign key empty. Please fill it out.')
+        return
+      }
+    }
+  }
+
+  // Course function to find the following name of the student corresponding to ID;
+  const getStudent = (studentid) => {
+    // Iterates through all students checking if studentd matches form studentid
+    const student = students.find(student => student.studentID === studentid)
+    // COURSE(IF TRUE, ELSE FALSE): TRUE VALUE : FALSE VALUE
+    return student ? student.studentID : null;
+  }
+
+  // The delete operation for the following earning table
+  const deleteEarning = async (earningID) => {
+    setUpdateForm(false)
+    setForm(false)
+    console.log(earningID)
+    try {
+      const response = await fetch(`http://flip4.engr.oregonstate.edu:4283/earning/${earningID}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        console.log('Earning deleted successfully');
+        fetch('http://flip4.engr.oregonstate.edu:4283/earning')
+          .then(response => response.json())
+          .then(data => setEarningData(data))
+          .catch(error => console.error('Error fetching data:', error));
+      }
+    } catch (error) {
+      console.error('Error deleting earning:', error);
+    }
+  };
 
   return (
     <section>
       <Container fluid className="basic-info" id="student">
         <Container className="content">
-          <button type="button" class="btn btn-dark" onClick={() => setForm(0)}>
+          <button type="button" class="btn btn-dark" onClick={() => setForm(!form)}>
             Add Financial Earning
           </button>
-          {form == 0 && (
+          {form && (
             <>
               <h1>Add Financial Earnings </h1>
-              <h2>Salaries are automatically converted to USD.</h2>
+              <h2>If Financial Information is not inputted will directly
+                assume a 1 dollar in each column.
+              </h2>
               <Row>
                 <Col md={7}>
-                  <Form className="form-box">
-                    <Form.Group className="mb-2">
-                      <Form.Label>Prior Salary</Form.Label>
-                      <Form.Control type="text" />
+                  <Form className="form-box" onSubmit={handleSubmit}>
+                    <Form.Label>Previous Salary</Form.Label>
+                    <InputGroup className="mb-3">
+                      <InputGroup.Text>$</InputGroup.Text>
+                      <Form.Control
+                        placeholder="Enter Dollar Amount"
+                        name="prev"
+                        value={formData.prev}
+                        onChange={handleChange}
+                        aria-label="Amount (to the nearest dollar)"
+                      />
+                      <InputGroup.Text>.00</InputGroup.Text>
                       <Form.Text style={{ color: "whitesmoke" }}>
                         What was your previous salary before enrolling in OSU if
                         possible?
                       </Form.Text>
-                    </Form.Group>
+                    </InputGroup>
+
+                    <Form.Label>Tuition Cost</Form.Label>
+                    <InputGroup className="mb-3">
+                      <InputGroup.Text>$</InputGroup.Text>
+                      <Form.Control
+                        placeholder="Enter Dollar Amount"
+                        name="tuition"
+                        value={formData.tuition}
+                        onChange={handleChange}
+                      />
+                      <InputGroup.Text>.00</InputGroup.Text>
+                    </InputGroup>
+
+                    <Form.Label>Student Total Loans</Form.Label>
+                    <InputGroup className="mb-3">
+                      <InputGroup.Text>$</InputGroup.Text>
+                      <Form.Control
+                        placeholder="Enter Dollar Amount"
+                        name="loan"
+                        value={formData.loan}
+                        onChange={handleChange}
+                      />
+                      <InputGroup.Text>.00</InputGroup.Text>
+                    </InputGroup>
+
+                    <Form.Label>Misc. Expenses</Form.Label>
+                    <InputGroup className="mb-3">
+                      <InputGroup.Text>$</InputGroup.Text>
+                      <Form.Control
+                        placeholder="Enter Dollar Amount"
+                        name="misc"
+                        value={formData.misc}
+                        onChange={handleChange}
+                      />
+                      <InputGroup.Text>.00</InputGroup.Text>
+                    </InputGroup>
+
+                    <Form.Label>Loan Interest</Form.Label>
+                    <InputGroup className="mb-3">
+
+                      <Form.Control
+                        placeholder="Enter Interest %"
+                        name="interest"
+                        value={formData.interest}
+                        onChange={handleChange}
+                      />
+                      <InputGroup.Text>%</InputGroup.Text>
+                    </InputGroup>
+
                     <Form.Group className="mb-2">
-                      <Form.Label>Current Salary</Form.Label>
-                      <Form.Control type="text" />
+                      <Form.Label> StudentID </Form.Label>
+                      <Form.Control
+                        as="select"
+                        placeholder="Enter StudentID Number"
+                        name="studentID"
+                        value={formData.studentID}
+                        onChange={handleChange}
+                      >
+                        {students.map(student => (
+                          <option key={student.studentID} value={student.studentID}>
+                            {student.studentID}
+                          </option>
+                        ))}
+                      </Form.Control>
+                    </Form.Group>
+
+                    <Form.Label>Current Salary</Form.Label>
+                    <InputGroup className="mb-3">
+                      <InputGroup.Text>$</InputGroup.Text>
+                      <Form.Control
+                        placeholder="Enter Dollar Amount"
+                        name="current"
+                        value={formData.current}
+                        onChange={handleChange}
+                      />
+                      <InputGroup.Text>.00</InputGroup.Text>
                       <Form.Text style={{ color: "whitesmoke" }}>
-                        What is your new salary after graduating OSU if
+                        What is your new salary after or currently enrolling in OSU if
                         possible?
                       </Form.Text>
-                    </Form.Group>
-                    <Form.Group className="mb-5">
-                      <Form.Label>Tuition Cost</Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Your total tuition cost..."
-                      />
-                    </Form.Group>
-                    <Form.Group className="mb-5">
-                      <Form.Label>Student Total Loan</Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Your total taken loans..."
-                      />
-                    </Form.Group>
-                    <Form.Group className="mb-5">
-                      <Form.Label>Misc. Expenses</Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Any unrelated expenses..."
-                      />
-                    </Form.Group>
-                    <Form.Group className="mb-5">
-                      <Form.Label>Loan Interest %</Form.Label>
-                      <Form.Control type="text" />
-                    </Form.Group>
-                    <Form.Group className="mb-5">
-                      <Form.Label>Student ID</Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="The OSU issued Student ID"
-                      />
-                    </Form.Group>
+                    </InputGroup>
                     <Button variant="primary" type="submit">
                       Add
                     </Button>
@@ -81,82 +313,122 @@ function FinancialEarnings() {
               </Row>
             </>
           )}
-          {form == 1 && (
+          {updateform && (
             <>
               <h1>Update Financial Earnings </h1>
-              <h2>Salaries are automatically converted to USD.</h2>
+              <h2>Update Financial Information based on ID clicked.</h2>
               <Row>
                 <Col md={7}>
-                  <Form className="form-box">
-                    <Form.Group className="mb-2">
-                      <Form.Label>Prior Salary</Form.Label>
-                      <Form.Control type="text" />
+                  <Form className="form-box" onSubmit={updateEarning}>
+                  <Form.Group className="mb-2">
+                      <Form.Label>EarningID</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Enter Earning ID"
+                        name="earningID"
+                        value={updateFormData.earningID}
+                        onChange={handleUpdateChange}
+                      />
+                    </Form.Group>
+                    <Form.Label>Previous Salary</Form.Label>
+                    <InputGroup className="mb-3">
+                      <InputGroup.Text>$</InputGroup.Text>
+                      <Form.Control
+                        placeholder="Enter Dollar Amount"
+                        name="prev"
+                        value={updateFormData.prev}
+                        onChange={handleUpdateChange}
+                        aria-label="Amount (to the nearest dollar)"
+                      />
+                      <InputGroup.Text>.00</InputGroup.Text>
                       <Form.Text style={{ color: "whitesmoke" }}>
                         What was your previous salary before enrolling in OSU if
                         possible?
                       </Form.Text>
-                    </Form.Group>
+                    </InputGroup>
+
+                    <Form.Label>Tuition Cost</Form.Label>
+                    <InputGroup className="mb-3">
+                      <InputGroup.Text>$</InputGroup.Text>
+                      <Form.Control
+                        placeholder="Enter Dollar Amount"
+                        name="tuition"
+                        value={updateFormData.tuition}
+                        onChange={handleUpdateChange}
+                      />
+                      <InputGroup.Text>.00</InputGroup.Text>
+                    </InputGroup>
+
+                    <Form.Label>Student Total Loans</Form.Label>
+                    <InputGroup className="mb-3">
+                      <InputGroup.Text>$</InputGroup.Text>
+                      <Form.Control
+                        placeholder="Enter Dollar Amount"
+                        name="loan"
+                        value={updateFormData.loan}
+                        onChange={handleUpdateChange}
+                      />
+                      <InputGroup.Text>.00</InputGroup.Text>
+                    </InputGroup>
+
+                    <Form.Label>Misc. Expenses</Form.Label>
+                    <InputGroup className="mb-3">
+                      <InputGroup.Text>$</InputGroup.Text>
+                      <Form.Control
+                        placeholder="Enter Dollar Amount"
+                        name="misc"
+                        value={updateFormData.misc}
+                        onChange={handleUpdateChange}
+                      />
+                      <InputGroup.Text>.00</InputGroup.Text>
+                    </InputGroup>
+
+                    <Form.Label>Loan Interest</Form.Label>
+                    <InputGroup className="mb-3">
+
+                      <Form.Control
+                        placeholder="Enter Interest %"
+                        name="interest"
+                        value={updateFormData.interest}
+                        onChange={handleUpdateChange}
+                      />
+                      <InputGroup.Text>%</InputGroup.Text>
+                    </InputGroup>
+
                     <Form.Group className="mb-2">
-                      <Form.Label>Current Salary</Form.Label>
-                      <Form.Control type="text" />
+                      <Form.Label> StudentID </Form.Label>
+                      <Form.Control
+                        as="select"
+                        placeholder="Enter StudentID Number"
+                        name="studentID"
+                        value={updateFormData.studentID}
+                        onChange={handleUpdateChange}
+                      >
+                        {students.map(student => (
+                          <option key={student.studentID} value={student.studentID}>
+                            {student.studentID}
+                          </option>
+                        ))}
+                      </Form.Control>
+                    </Form.Group>
+
+                    <Form.Label>Current Salary</Form.Label>
+                    <InputGroup className="mb-3">
+                      <InputGroup.Text>$</InputGroup.Text>
+                      <Form.Control
+                        placeholder="Enter Dollar Amount"
+                        name="current"
+                        value={updateFormData.current}
+                        onChange={handleUpdateChange}
+                      />
+                      <InputGroup.Text>.00</InputGroup.Text>
                       <Form.Text style={{ color: "whitesmoke" }}>
-                        What is your new salary after graduating OSU if
+                        What is your new salary after or currently enrolling in OSU if
                         possible?
                       </Form.Text>
-                    </Form.Group>
-                    <Form.Group className="mb-5">
-                      <Form.Label>Tuition Cost</Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Your total tuition cost..."
-                      />
-                    </Form.Group>
-                    <Form.Group className="mb-5">
-                      <Form.Label>Student Total Loan</Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Your total taken loans..."
-                      />
-                    </Form.Group>
-                    <Form.Group className="mb-5">
-                      <Form.Label>Misc. Expenses</Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Any unrelated expenses..."
-                      />
-                    </Form.Group>
-                    <Form.Group className="mb-5">
-                      <Form.Label>Loan Interest %</Form.Label>
-                      <Form.Control type="text" />
-                    </Form.Group>
-                    <Form.Group className="mb-5">
-                      <Form.Label>Student ID</Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="The OSU issued Student ID"
-                      />
-                    </Form.Group>
+                    </InputGroup>
                     <Button variant="primary" type="submit">
                       Update
-                    </Button>
-                  </Form>
-                </Col>
-              </Row>
-            </>
-          )}
-          {form == 2 && (
-            <>
-              <h1>Delete Financial Earnings </h1>
-              <h2>Salaries are automatically converted to USD.</h2>
-              <Row>
-                <Col md={7}>
-                  <Form className="form-box">
-                    <Form.Group className="mb-2">
-                      <Form.Label>Enter the earningsID</Form.Label>
-                      <Form.Control type="text" />
-                    </Form.Group>
-                    <Button variant="primary" type="submit">
-                      Delete
                     </Button>
                   </Form>
                 </Col>
@@ -179,123 +451,41 @@ function FinancialEarnings() {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>1</td>
-                <td>65000.00</td>
-                <td>35000.00</td>
-                <td>20000.00</td>
-                <td>5000.00</td>
-                <td>2.10</td>
-                <td>573625</td>
-                <td>75000.00</td>
-                <td>
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    onClick={() => setForm(1)}
-                  >
-                    +
-                  </Button>
-                </td>
-                <td>
-                  <Button
-                    variant="danger"
-                    type="submit"
-                    onClick={() => setForm(2)}
-                  >
-                    X
-                  </Button>
-                </td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>55000.00</td>
-                <td>20000.00</td>
-                <td>35000.00</td>
-                <td>6000.00</td>
-                <td>3.00</td>
-                <td>428162</td>
-                <td>100000.00</td>
-                <td>
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    onClick={() => setForm(1)}
-                  >
-                    +
-                  </Button>
-                </td>
-                <td>
-                  <Button
-                    variant="danger"
-                    type="submit"
-                    onClick={() => setForm(2)}
-                  >
-                    X
-                  </Button>
-                </td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>70000.00</td>
-                <td>18000.00</td>
-                <td>2000.00</td>
-                <td>10000.00</td>
-                <td>2.75</td>
-                <td>283624</td>
-                <td>120000.00</td>
-                <td>
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    onClick={() => setForm(1)}
-                  >
-                    +
-                  </Button>
-                </td>
-                <td>
-                  <Button
-                    variant="danger"
-                    type="submit"
-                    onClick={() => setForm(2)}
-                  >
-                    X
-                  </Button>
-                </td>
-              </tr>
-              <tr>
-                <td>4</td>
-                <td>100000.00</td>
-                <td>42000.00</td>
-                <td>18000.00</td>
-                <td>15500.00</td>
-                <td>1.90</td>
-                <td>273623</td>
-                <td>85000.00</td>
-                <td>
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    onClick={() => setForm(1)}
-                  >
-                    +
-                  </Button>
-                </td>
-                <td>
-                  <Button
-                    variant="danger"
-                    type="submit"
-                    onClick={() => setForm(2)}
-                  >
-                    X
-                  </Button>
-                </td>
-              </tr>
+              {earnings.map(earning => (
+                <tr>
+                  <td>{earning.earningsID}</td>
+                  <td>${earning.priorSalary}.00</td>
+                  <td>${earning.tuitionCost}.00</td>
+                  <td>${earning.studentLoan}.00</td>
+                  <td>${earning.miscExpense}.00</td>
+                  <td>{earning.loanInterest}%</td>
+                  <td>{getStudent(earning.studentID)}</td>
+                  <td>${earning.newSalary}.00</td>
+                  <td>
+                    <Button
+                      variant="primary"
+                      type="submit"
+                      onClick={() => changeForms(earning)}
+                    >
+                      +
+                    </Button>
+                  </td>
+                  <td>
+                    <Button
+                      variant="danger"
+                      type="submit"
+                      onClick={() => deleteEarning(earning.earningsID)}
+                    >
+                      X
+                    </Button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </Table>
         </Container>
       </Container>
-    </section>
+    </section >
   );
 }
 

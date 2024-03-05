@@ -89,6 +89,19 @@ app.get('/review', (req, res) => {
   });
 });
 
+// Gets student data
+app.get('/earning', (req, res) => {
+  const query = 'SELECT * FROM FinancialEarnings';
+  pool.query(query, (err, results) => {
+    if (err) {
+      console.error('Error executing query:', err);
+      res.status(500).send('Error fetching data');
+      return;
+    }
+    res.json(results);
+  });
+});
+
 // Post routes
 app.post("/student", (req, res) => {
   console.log(req.body)
@@ -122,6 +135,25 @@ app.post("/review", (req, res) => {
     res.status(200).json({ message: 'Student added successfully' });
   });
 });
+
+app.post("/earning", (req, res) => {
+  const { prev, tuition, loan, misc, interest, studentID, current } = req.body;
+  const q = `INSERT INTO FinancialEarnings (priorSalary, tuitionCost, studentLoan,
+    miscExpense,loanInterest,studentID, newSalary) VALUES (?, ?, ?, ? ,? ,? ,?)`;
+  const values = [prev, tuition, loan, misc, interest, studentID, current];
+  console.log(studentID)
+  pool.query(q, values, (err) => {
+    if (err) {
+      console.error('Error executing query:', err);
+      res.status(500).send('Error executing query');
+      return;
+    }
+    console.log('Earning added successfully');
+    res.status(200).json({ message: 'Earning added successfully' });
+  });
+});
+
+
 
 
 /*
@@ -172,6 +204,29 @@ app.put("/review/:reviewID", (req, res) => {
   });
 });
 
+app.put("/earning/:earningID", (req, res) => {
+  const { prev, tuition, loan, misc, interest, studentID, current } = req.body;
+  const q = `UPDATE FinancialEarnings SET priorSalary = ?, tuitionCost = ?, studentLoan = ?,
+  miscExpense = ?,loanInterest = ?,studentID =?, newSalary =? WHERE earningsID = ?`;
+
+  const earningID = req.params.earningID;
+  pool.query(q, [prev, tuition, loan, misc, interest, studentID, current, earningID], (err, result) => {
+    if (err) {
+      
+      console.error('Error updating earning:', err);
+      res.status(500).json({ error: 'Failed to update earning' });
+      return;
+    }
+    if (result.affectedRows === 0) {
+      res.status(404).send(`Could not locate earning with earning of ${earningID}.`);
+      return;
+    }
+    console.log('Earning updated successfully');
+    
+    res.status(200).json({ message: 'Earning updated successfully' });
+  });
+});
+
 /*
 DELETE ROUTES
 */
@@ -206,6 +261,20 @@ app.delete('/review/:reviewID', (req, res) => {
   });
 });
 
+app.delete('/earning/:earningID', (req, res) => {
+  const earningID = req.params.earningID;
+  const q = 'DELETE FROM FinancialEarnings WHERE earningsID = ?';
+
+  pool.query(q, [earningID], (err) => {
+    if (err) {
+      console.error('Error deleting earning:', err);
+      res.status(500).json({ error: 'Failed to delete earning' });
+      return;
+    }
+    console.log('Earning deleted successfully');
+    res.sendStatus(204); // No content - deletion successful
+  });
+});
 
 
 
