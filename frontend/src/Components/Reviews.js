@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 /*Import components from react-bootstrap */
 import Container from "react-bootstrap/Container";
@@ -9,41 +9,228 @@ import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
 
 function Reviews() {
-  const [form, setForm] = useState(null);
+  const [form, setForm] = useState(false);
+  const [updateform, setUpdateForm] = useState(false);
+  // The review data which is pulled for the backend 
+  const [reviews, setReviewData] = useState([]);
+  // The review data which is pulled for the backend 
+  const [courses, setCourseData] = useState([]);
+  // The email error which is a boolean state
+  const [emailError, setEmailError] = useState(false)
+
+  // Side effect for loading component after each render
+  // Data is loaded once on load 
+  useEffect(() => {
+    fetch('http://flip4.engr.oregonstate.edu:4283/review')
+      .then(response => response.json())
+      .then(data => setReviewData(data))
+      .catch(error => console.error('Error fetching data:', error));
+  }, []);
+
+  // Side effect for loading component after each render
+  // Data is loaded once on load 
+  useEffect(() => {
+    fetch('http://flip4.engr.oregonstate.edu:4283/course')
+      .then(response => response.json())
+      .then(data => setCourseData(data))
+      .catch(error => console.error('Error fetching data:', error));
+  }, []);
+
+  // Form data which is a useState object
+  // Note some fields are set to the default values if not selected
+  const [formData, setFormData] = useState({
+    courseid: '',
+    unit: '',
+    feedback: '',
+  });
+
+  const [updateFormData, setUpdateFormData] = useState({
+    courseid: '',
+    unit: '',
+    feedback: '',
+  });
+
+  const changeForms = (review) => {
+    setForm(false)
+    setUpdateForm(!updateform)
+    setUpdateFormData({
+      reviewid: review.reviewID,
+      courseid: review.courseID,
+      unit: review.courseRating,
+      feedback: review.courseReview,
+    })
+    return
+  }
+
+  // handleChange arrow function called everytime a field is filled out
+  // Destructure e.target which has name,target
+  // update state with the previous formData object and new attribute:value pair
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name == "courseid" || name == "unit") {
+      let intValue = parseInt(value, 10);
+      setFormData({ ...formData, [name]: intValue })
+      return
+    }
+
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleUpdateChange = (e) => {
+    const { name, value } = e.target;
+    if (name == "courseid" || name == "unit") {
+      let intValue = parseInt(value, 10);
+      setUpdateFormData({ ...updateFormData, [name]: intValue })
+      return
+    }
+    setUpdateFormData({ ...updateFormData, [name]: value });
+  };
+
+  // Check if any of the fields are empty
+  const checkEmpty = () => {
+    for (const field in formData) {
+      if (formData[field] === '') {
+        alert('One or more of your fields are still empty. Please fill it out.')
+        return
+      }
+    }
+  }
+
+  // Course function to find the following name of the course corresponding to ID;
+  const findCourse = (courseid) => {
+    // Iterates through all courses checking if courseid matches form courseid
+    const course = courses.find(course => course.courseID === courseid)
+    // COURSE(IF TRUE, ELSE FALSE): TRUE VALUE : FALSE VALUE
+    return course ? course.courseName : null;
+  }
+
+  const checkEmptyUpdate = () => {
+    for (const field in updateFormData) {
+      if (updateFormData[field] === '') {
+        alert('One or more of your fields are still empty. Please fill it out.')
+        return
+      }
+    }
+  }
+  // On submit prevent webpage reload and check conditions
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    checkEmpty()
+
+    try {
+      const response = await fetch('http://flip4.engr.oregonstate.edu:4283/review', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+      if (response.ok) {
+        // Handle success
+        console.log('Review added successfully');
+        fetch('http://flip4.engr.oregonstate.edu:4283/review')
+          .then(response => response.json())
+          .then(data => setReviewData(data))
+          .catch(error => console.error('Error fetching data:', error));
+      }
+    } catch (error) {
+      console.error('Could not add review', error);
+    }
+  };
+
+
+  // Update the student table
+
+  const updateReview = async (e) => {
+    e.preventDefault();
+    checkEmptyUpdate()
+
+    const reviewID = updateFormData.reviewid;
+
+    try {
+      const response = await fetch(`http://flip4.engr.oregonstate.edu:4283/review/${reviewID}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateFormData)
+      });
+      if (response.ok) {
+        // Handle success
+        fetch('http://flip4.engr.oregonstate.edu:4283/review')
+          .then(response => response.json())
+          .then(data => setReviewData(data))
+          .catch(error => console.error('Error fetching data:', error));
+        setUpdateForm(!updateform)
+      }
+    } catch (error) {
+      console.error('Could not update review', error);
+    }
+  };
+
+  // The delete operation for the following student table
+  const deleteReview = async (reviewID) => {
+    setUpdateForm(false)
+    setForm(false)
+    try {
+      const response = await fetch(`http://flip4.engr.oregonstate.edu:4283/review/${reviewID}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        console.log('Review deleted successfully');
+        fetch('http://flip4.engr.oregonstate.edu:4283/review')
+          .then(response => response.json())
+          .then(data => setReviewData(data))
+          .catch(error => console.error('Error fetching data:', error));
+      }
+    } catch (error) {
+      console.error('Error deleting review:', error);
+    }
+  };
 
   return (
     <section>
       <Container fluid className="basic-info" id="student">
         <Container className="content">
-          <button type="button" class="btn btn-dark" onClick={() => setForm(0)}>
+          <button type="button" class="btn btn-dark" onClick={() => setForm(!form)}>
             Add Review
           </button>
-          {form == 0 && (
+          {form && (
             <>
               <h1>Add Review</h1>
               <Row>
                 <Col md={7}>
-                  <Form className="form-box">
+                  <Form className="form-box" onSubmit={handleSubmit}>
                     <Form.Group className="mb-2">
                       <Form.Label> Course Number </Form.Label>
                       <Form.Control
-                        type="text"
+                        as="select"
                         placeholder="Enter Course Number"
-                      />
+                        name="courseid"
+                        value={formData.courseid}
+                        onChange={handleChange}
+                      >
+                        {courses.map(course => (
+                          <option key={course.courseID} value={course.courseID}>
+                            {course.courseID}:{course.courseName}
+                          </option>
+                        ))}
+                      </Form.Control>
                     </Form.Group>
                     <Form.Group className="mb-2">
                       <Form.Label>Rating (Out of 10)</Form.Label>
-                      <select class="form-control" id="unit">
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                        <option>4</option>
-                        <option>5</option>
-                        <option>6</option>
-                        <option>7</option>
-                        <option>8</option>
-                        <option>9</option>
-                        <option>10</option>
+                      <select class="form-control" type="number" id="unit" value={formData.unit}
+                        onChange={handleChange} name="unit">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
                       </select>
                       <Form.Text style={{ color: "whitesmoke" }}>
                         On a scale of 1 to 10, where 10 is excellent and 1 is
@@ -57,6 +244,9 @@ function Reviews() {
                           class="form-control"
                           id="Text-description"
                           placeholder="Review for this course..."
+                          name="feedback"
+                          value={formData.feedback}
+                          onChange={handleChange}
                           rows="3"
                         ></textarea>
                         <Form.Text style={{ color: "whitesmoke" }}>
@@ -72,32 +262,55 @@ function Reviews() {
               </Row>
             </>
           )}
-          {form == 1 && (
+          {updateform == 1 && (
             <>
               <h1>Update Review</h1>
               <Row>
                 <Col md={7}>
-                  <Form className="form-box">
+                  <Form className="form-box" onSubmit={updateReview}>
                     <Form.Group className="mb-2">
-                      <Form.Label> courseNumber </Form.Label>
+                      <Form.Label> ReviewID </Form.Label>
                       <Form.Control
                         type="text"
-                        placeholder="Enter Course Number"
+                        placeholder="Enter Review ID"
+                        name="reviewid"
+                        value={updateFormData.reviewid}
+                        onChange={handleUpdateChange}
                       />
+                      <Form.Text style={{ color: "whitesmoke" }}>
+                      Please update the following reviewID information you selected.
+                    </Form.Text>
+                    </Form.Group>             
+                    <Form.Group className="mb-2">
+                      <Form.Label> Course Number </Form.Label>
+                      <Form.Control
+                        as="select"
+                        placeholder="Enter Course Number"
+                        name="courseid"
+                        value={updateFormData.courseid}
+                        onChange={handleUpdateChange}
+                      >
+                        {courses.map(course => (
+                          <option key={course.courseID} value={course.courseID}>
+                            {course.courseID}:{course.courseName}
+                          </option>
+                        ))}
+                      </Form.Control>
                     </Form.Group>
                     <Form.Group className="mb-2">
                       <Form.Label>Rating (Out of 10)</Form.Label>
-                      <select class="form-control" id="unit">
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                        <option>4</option>
-                        <option>5</option>
-                        <option>6</option>
-                        <option>7</option>
-                        <option>8</option>
-                        <option>9</option>
-                        <option>10</option>
+                      <select class="form-control" type="number" id="unit" value={updateFormData.unit}
+                        onChange={handleUpdateChange} name="unit">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
                       </select>
                       <Form.Text style={{ color: "whitesmoke" }}>
                         On a scale of 1 to 10, where 10 is excellent and 1 is
@@ -112,6 +325,9 @@ function Reviews() {
                           id="Text-description"
                           placeholder="Review for this course..."
                           rows="3"
+                          name="feedback"
+                          value={updateFormData.feedback}
+                          onChange={handleUpdateChange}
                         ></textarea>
                         <Form.Text style={{ color: "whitesmoke" }}>
                           How was this course beneficial in your job search.
@@ -126,27 +342,6 @@ function Reviews() {
               </Row>
             </>
           )}
-          {form == 2 && (
-            <>
-              <h1>Delete Review</h1>
-              <Row>
-                <Col md={7}>
-                  <Form className="form-box">
-                    <Form.Group className="mb-2">
-                      <Form.Label> reviewID </Form.Label>
-                      <Form.Control type="text" placeholder="Enter Review ID" />
-                      <Form.Text style={{ color: "whitesmoke" }}>
-                        Please enter the reviewID you want deleted.
-                      </Form.Text>
-                    </Form.Group>
-                    <Button variant="primary" type="submit">
-                      Delete review
-                    </Button>
-                  </Form>
-                </Col>
-              </Row>
-            </>
-          )}
           <Table striped bordered hover style={{ marginTop: "20px" }}>
             <thead>
               <tr>
@@ -155,125 +350,28 @@ function Reviews() {
                 <th>Course #</th>
                 <th>Rating</th>
                 <th>Review</th>
-                <th>Add</th>
+                <th>Update</th>
                 <th>Delete</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>1</td>
-                <td>INTRODUCTION TO DATABASES</td>
-                <td>340</td>
-                <td>9</td>
+              {reviews.map(review => (<tr>
+                <td>{review.reviewID}</td>
+                <td>{findCourse(review.courseID)}</td>
+                <td>{review.courseID}</td>
+                <td>{review.courseRating}</td>
+                <td>{review.courseReview}</td>
                 <td>
-                  This course provided valuable skills like querying with SQL
-                  and database management that directly helped me secure an
-                  internship.
-                </td>
-                <td>
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    onClick={() => setForm(1)}
-                  >
+                  <Button variant="primary" type="submit" onClick={() => changeForms(review)}>
                     +
                   </Button>
                 </td>
                 <td>
-                  <Button
-                    variant="danger"
-                    type="submit"
-                    onClick={() => setForm(2)}
-                  >
+                  <Button variant="danger" type="submit" onClick={() => deleteReview(review.reviewID)}>
                     X
                   </Button>
                 </td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>DATA STRUCTURES</td>
-                <td>261</td>
-                <td>9</td>
-                <td>
-                  While the course content was useful and beneficial to
-                  understanding data structures, I wish there were more
-                  career-oriented and practical projects.
-                </td>
-                <td>
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    onClick={() => setForm(1)}
-                  >
-                    +
-                  </Button>
-                </td>
-                <td>
-                  <Button
-                    variant="danger"
-                    type="submit"
-                    onClick={() => setForm(2)}
-                  >
-                    X
-                  </Button>
-                </td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>ANALYSIS OF ALGORITHMS</td>
-                <td>325</td>
-                <td>4</td>
-                <td>
-                  The concepts taught in this course are directly helpful for
-                  technical interviews.
-                </td>
-                <td>
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    onClick={() => setForm(1)}
-                  >
-                    +
-                  </Button>
-                </td>
-                <td>
-                  <Button
-                    variant="danger"
-                    type="submit"
-                    onClick={() => setForm(2)}
-                  >
-                    X
-                  </Button>
-                </td>
-              </tr>
-              <tr>
-                <td>4</td>
-                <td>OPERATING SYSTEMS</td>
-                <td>344</td>
-                <td>3</td>
-                <td>
-                  Good course overall, but I would have hoped there were more
-                  practical projects to add to my resume.
-                </td>
-                <td>
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    onClick={() => setForm(1)}
-                  >
-                    +
-                  </Button>
-                </td>
-                <td>
-                  <Button
-                    variant="danger"
-                    type="submit"
-                    onClick={() => setForm(2)}
-                  >
-                    X
-                  </Button>
-                </td>
-              </tr>
+              </tr>))}
             </tbody>
           </Table>
         </Container>

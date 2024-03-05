@@ -44,7 +44,6 @@ function Navigation() {
                 Student
               </Nav.Link>
         </Nav.Item>
-        {/* 
         <Nav.Item >
               <Nav.Link as={Link} to="/course" >
                 Courses
@@ -75,7 +74,6 @@ function Navigation() {
                 Enrollments
               </Nav.Link>
         </Nav.Item>
-        */}
         </Navbar.Collapse>
       </Container>
     </Navbar>

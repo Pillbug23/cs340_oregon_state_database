@@ -15,15 +15,26 @@ function Student() {
   const [updateform, setUpdateForm] = useState(false);
   // The student data which is pulled for the backend 
   const [students, setStudentData] = useState([]);
+  // The student data which is pulled for the backend 
+  const [companies, setCompanyData] = useState([]);
   // The email error which is a boolean state
   const [emailError, setEmailError] = useState(false)
 
   // Side effect for loading component after each render
   // Data is loaded once on load 
   useEffect(() => {
-    fetch('http://localhost:4283/student')
+    fetch('http://flip4.engr.oregonstate.edu:4283/student')
       .then(response => response.json())
       .then(data => setStudentData(data))
+      .catch(error => console.error('Error fetching data:', error));
+  }, []);
+
+  // Side effect for loading component after each render
+  // Data is loaded once on load 
+  useEffect(() => {
+    fetch('http://flip4.engr.oregonstate.edu:4283/company')
+      .then(response => response.json())
+      .then(data => setCompanyData(data))
       .catch(error => console.error('Error fetching data:', error));
   }, []);
 
@@ -49,9 +60,18 @@ function Student() {
     graduated: 'No'
   });
 
-  const changeForms = () => {
+  const changeForms = (student) => {
     setForm(false)
     setUpdateForm(!updateform)
+    setUpdateFormData({
+      studentid: student.studentID,
+      name: student.studentName,
+      email: student.studentEmail,
+      gender: student.studentGender,
+      company: student.companyID,
+      previousMajor: student.previousMajor,
+      graduated: student.graduated
+    })
     return
   }
 
@@ -95,7 +115,7 @@ function Student() {
       return
     }
     try {
-      const response = await fetch('http://localhost:4283/student', {
+      const response = await fetch('http://flip4.engr.oregonstate.edu:4283/student', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -105,7 +125,7 @@ function Student() {
       if (response.ok) {
         // Handle success
         console.log('Student added successfully');
-        fetch('http://localhost:4283/student') 
+        fetch('http://flip4.engr.oregonstate.edu:4283/student')
           .then(response => response.json())
           .then(data => setStudentData(data))
           .catch(error => console.error('Error fetching data:', error));
@@ -125,11 +145,11 @@ function Student() {
       setEmailError(true)
       return
     }
-    
+
     const studentID = updateFormData.studentid;
 
     try {
-      const response = await fetch(`http://localhost:4283/student/${studentID}`, {
+      const response = await fetch(`http://flip4.engr.oregonstate.edu:4283/student/${studentID}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -138,11 +158,11 @@ function Student() {
       });
       if (response.ok) {
         // Handle success
-        console.log('Student updated successfully');
-        fetch('http://localhost:4283/student') 
+        fetch('http://flip4.engr.oregonstate.edu:4283/student')
           .then(response => response.json())
           .then(data => setStudentData(data))
           .catch(error => console.error('Error fetching data:', error));
+        setUpdateForm(!updateform)
       }
     } catch (error) {
       console.error('Could not update student', error);
@@ -151,21 +171,25 @@ function Student() {
 
   // The delete operation for the following student table
   const deleteStudent = async (studentID) => {
+    setUpdateForm(false)
+    setForm(false)
     try {
-      const response = await fetch(`http://localhost:4283/student/${studentID}`, {
+      const response = await fetch(`http://flip4.engr.oregonstate.edu:4283/student/${studentID}`, {
         method: 'DELETE',
       });
       if (response.ok) {
         console.log('Student deleted successfully');
-        fetch('http://localhost:4283/student') 
+        fetch('http://flip4.engr.oregonstate.edu:4283/student')
           .then(response => response.json())
           .then(data => setStudentData(data))
           .catch(error => console.error('Error fetching data:', error));
-      } 
+      }
     } catch (error) {
       console.error('Error deleting student:', error);
     }
   };
+
+
   return (
     <section>
       <Container fluid className="basic-info" id="student">
@@ -225,10 +249,11 @@ function Student() {
                       <Form.Control as="select" placeholder="Company" name="company"
                         value={formData.company}
                         onChange={handleChange}>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
+                        {companies.map(company => (
+                          <option key={company.companyID} value={company.companyID}>
+                            {company.companyID}:{company.companyName}
+                          </option>
+                        ))}
                       </Form.Control>
                     </Form.Group>
                     <Form.Group className="mb-2">
@@ -303,7 +328,7 @@ function Student() {
                         <option value="F">Female</option>
                         <option value="X">Intersex</option>
                       </Form.Control>
-                      </Form.Group>
+                    </Form.Group>
                     <Form.Group className="mb-2">
                       <Form.Label>Current Company</Form.Label>
                       <Form.Control as="select" placeholder="Company" name="company"
@@ -365,7 +390,7 @@ function Student() {
                 <td>{student.previousMajor}</td>
                 <td>{student.graduated}</td>
                 <td>
-                  <Button variant="primary" type="submit" onClick={() => changeForms()}>
+                  <Button variant="primary" type="submit" onClick={() => changeForms(student)}>
                     +
                   </Button>
                 </td>
