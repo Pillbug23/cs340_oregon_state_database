@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 /*Import components from react-bootstrap */
 import Container from "react-bootstrap/Container";
@@ -9,130 +9,195 @@ import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
 
 function Instructors() {
+  // The form state which decides which form is filled out.
+  // For example clicking on add makes form 1, update makes form 2.
+  const [form, setForm] = useState(false);
+  // The instructor data which is pulled for the backend 
+  const [instructors, setInstructorData] = useState([]);
+  // The email error which is a boolean state
+ 
+  
+
+  // Side effect for loading component after each render
+  // Data is loaded once on load 
+  useEffect(() => {
+    fetch('http://flip4.engr.oregonstate.edu:4283/instructor')
+      .then(response => response.json())
+      .then(data => setInstructorData(data))
+      .catch(error => console.error('Error fetching data:', error));
+  }, []);
+
+  // Form data which is a useState object
+  // Note some fields are set to the default values if not selected
+  const [formData, setFormData] = useState({
+    instructorName: '',
+    instructorEmail: '',
+    instructorGender: '',
+    instructorQualifications: '',
+    yearsTaught: '',
+  });
+
+
+  // handleChange arrow function called everytime a field is filled out
+  // Destructure e.target which has name,target
+  // update state with the previous formData object and new attribute:value pair
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+
+
+  // Check if any of the fields are empty
+  const checkEmpty = () => {
+    for (const field in formData) {
+      if (formData[field] === '') {
+        alert('One or more of your fields are still empty. Please fill it out.')
+        return
+      }
+    }
+  }
+
+ 
+  // On submit prevent webpage reload and check conditions
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    checkEmpty()
+    try {
+      const response = await fetch('http://flip4.engr.oregonstate.edu:4283/instructor', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+      if (response.ok) {
+        // Handle success
+        console.log('Instructor added successfully');
+        fetch('http://flip4.engr.oregonstate.edu:4283/instructor') 
+          .then(response => response.json())
+          .then(data => setInstructorData(data))
+          .catch(error => console.error('Error fetching data:', error));
+      }
+    } catch (error) {
+      console.error('Could not add instructor', error);
+    }
+  };
+
+  const deleteInstructor = async (instructorID) => {
+    try {
+      const response = await fetch(`http://flip4.engr.oregonstate.edu:4283/instructor/${instructorID}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        console.log('Instructor deleted successfully');
+        fetch('http://flip4.engr.oregonstate.edu:4283/instructor') 
+          .then(response => response.json())
+          .then(data => setInstructorData(data))
+          .catch(error => console.error('Error fetching data:', error));
+      } 
+    } catch (error) {
+      console.error('Error deleting instructor:', error);
+    }
+  };
+  
   return (
     <section>
-      <Container fluid className="basic-info" id="course">
+      <Container fluid className="basic-info" id="student">
         <Container className="content">
-          <h1>Add Instructor </h1>
-          <Row>
-            <Col md={7}>
-              <Form className="form-box">
-                <Form.Group className="mb-2">
-                  <Form.Label>Name</Form.Label>
-                  <Form.Control type="text" placeholder="Name" />
-                </Form.Group>
-                <Form.Group className="mb-2">
-                  <Form.Label>Email</Form.Label>
-                  <Form.Control type="text" placeholder="Email" />
-                </Form.Group>
-                <Form.Group className="mb-2">
-                  <Form.Label>Gender</Form.Label>
-                  <div class="form-check">
-                    <input
-                      class="form-check-input"
-                      type="radio"
-                      name="flexRadioDefault"
-                      id="flexRadioGender"
-                    />
-                    <label class="form-check-label" for="flexRadioGender">
-                      Male
-                    </label>
-                  </div>
-                  <div class="form-check">
-                    <input
-                      class="form-check-input"
-                      type="radio"
-                      name="flexRadioDefault"
-                      id="flexRadioGender"
-                    />
-                    <label class="form-check-label" for="flexRadioGender">
-                      Female
-                    </label>
-                  </div>
-                  <div class="form-check">
-                    <input
-                      class="form-check-input"
-                      type="radio"
-                      name="flexRadioDefault"
-                      id="flexRadioGender"
-                    />
-                    <label class="form-check-label" for="flexRadioGender">
-                      Intersex
-                    </label>
-                  </div>
-                </Form.Group>
-                <Form.Group className="mb-2">
-                  <Form.Label>Qualifications</Form.Label>
-                  <div class="form-group">
-                    <textarea
-                      class="form-control"
-                      id="Text-description"
-                      placeholder="List the academic qualifications of the instructor..."
-                      rows="3"
-                    ></textarea>
-                  </div>
-                </Form.Group>
-                <Form.Group className="mb-5">
-                  <Form.Label>Years Taught</Form.Label>
-                  <Form.Control type="text" />
-                </Form.Group>
-                <Button variant="primary" type="submit">
-                  Add instructor
-                </Button>
-              </Form>
-            </Col>
-          </Row>
+          <button type="button" class="btn btn-dark" onClick={() => setForm(!form)}>
+            Add Instructor
+          </button>
+          {form && (
+            <>
+              <h1>Add Instructor </h1>
+              <Row>
+              <Col md={7}>
+              <Form className="form-box" onSubmit={handleSubmit}>
+                  <Form.Group className="mb-2">
+                          <Form.Label>Name</Form.Label>
+                          <Form.Control type="text" placeholder="Name" name="instructorName"
+                            value={formData.instructorName}
+                            onChange={handleChange} />
+                  </Form.Group>
+                  <Form.Group className="mb-2">
+                          <Form.Label>Email</Form.Label>
+                          <Form.Control type="text" placeholder="Email" name="instructorEmail"
+                            value={formData.instructorEmail}
+                            onChange={handleChange} />
+                  </Form.Group>
+                  <Form.Group className="mb-2">
+                          <Form.Label>Gender</Form.Label>
+                          <Form.Control
+                            as="select"
+                            name="instructorGender"
+                            value={formData.instructorGender}
+                            onChange={handleChange}
+                          >
+                            <option value="M">Male</option>
+                            <option value="F">Female</option>
+                            <option value="X">Intersex</option>
+                          </Form.Control>
+                  </Form.Group>
+                  <Form.Group className="mb-5">
+                        <Form.Label>Qualifications</Form.Label>
+                        <Form.Control as="textarea" rows="3"
+                        placeholder="Qualifications" 
+                        name="instructorQualifications"
+                        value={formData.instructorQualifications}
+                        onChange={handleChange} 
+                        />
+                    </Form.Group>
+                  <Form.Group className="mb-5">
+                        <Form.Label>Years Taught</Form.Label>
+                        <Form.Control type="text" 
+                        placeholder="Years Taught" 
+                        name="yearsTaught"
+                        value={formData.yearsTaught}
+                        onChange={handleChange} 
+                        />
+                  </Form.Group>
+                  <Button variant="primary" type="submit">
+                    Add Instructor
+                  </Button>
+                </Form>
+              </Col>
+            </Row>
+            </>
+          )}
           <Table striped bordered hover style={{ marginTop: "20px" }}>
-            <thead>
-              <tr>
-                <th>instructorID#</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Gender</th>
-                <th>Qualifications</th>
-                <th>Years Taught</th>
-              </tr>
-            </thead>
+              <thead>
+                <tr>
+                  <th>instructorID#</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Gender</th>
+                  <th>Qualifications</th>
+                  <th>Years Taught</th>
+                  <th>Delete</th>
+                </tr>
+              </thead>
             <tbody>
-              <tr>
-                <td>1</td>
-                <td>Michael Curry</td>
-                <td>m.curry@oregonstate.edu</td>
-                <td>Male</td>
-                <td>Ph.D. in Computer Science, 10+ years of teaching experience at Oregon State (Curry, n.d.)</td>
-                <td>4</td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>Randy Scovil</td>
-                <td>r.scovil@oregonstate.edu</td>
-                <td>Male</td>
-                <td>Master's in Computer Science, Worked as a SWE at Google for 2 years (Scovil, n.d.)</td>
-                <td>2</td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>Doshna Reddy</td>
-                <td>d.reddy@oregonstate.edu</td>
-                <td>Female</td>
-                <td>Ph.D. in Computer Science, Six Years experience as a software engineer
-(Reddy, n.d.)</td>
-                <td>8</td>
-              </tr>
-              <tr>
-                <td>4</td>
-                <td>Jonathan Lee</td>
-                <td>j.lee@oregonstate.edu</td>
-                <td>Male</td>
-                <td>Taught Operating Systems at UC San Diego for 6 years, co-wrote 2 software engineering papers</td>
-                <td>6</td>
-              </tr>
-            </tbody>
+                {instructors.map(instructor => (<tr>
+                  <td>{instructor.instructorID}</td>
+                  <td>{instructor.instructorName}</td>
+                  <td>{instructor.instructorEmail}</td>
+                  <td>{instructor.instructorGender}</td>
+                  <td>{instructor.instructorQualifications}</td>
+                  <td>{instructor.yearsTaught}</td>
+                  <td>
+                    <Button variant="danger" type="submit" onClick={() => deleteInstructor(instructor.instructorID)}>
+                      X
+                    </Button>
+                  </td>
+                </tr>))}
+              </tbody>
           </Table>
         </Container>
       </Container>
     </section>
   );
 }
+
 
 export default Instructors;

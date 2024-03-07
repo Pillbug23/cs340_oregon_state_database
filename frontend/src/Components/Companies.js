@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 /*Import components from react-bootstrap */
 import Container from "react-bootstrap/Container";
@@ -9,65 +9,156 @@ import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
 
 function Companies() {
-  return (
+
+  const [form, setForm] = useState(false);
+  // The Company data which is pulled for the backend 
+  const [companies, setCompanyData] = useState([]);
+ 
+
+  // Side effect for loading component after each render
+  // Data is loaded once on load 
+  useEffect(() => {
+    fetch('http://flip4.engr.oregonstate.edu:4283/company')
+      .then(response => response.json())
+      .then(data => setCompanyData(data))
+      .catch(error => console.error('Error fetching data:', error));
+  }, []);
+
+  // Form data which is a useState object
+  // Note some fields are set to the default values if not selected
+  const [formData, setFormData] = useState({
+    companyName: '',
+    role: '', 
+  });
+
+
+  // handleChange arrow function called everytime a field is filled out
+  // Destructure e.target which has name,target
+  // update state with the previous formData object and new attribute:value pair
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  // Check if any of the fields are empty
+  const checkEmpty = () => {
+    for (const field in formData) {
+      if (formData[field] === '') {
+        alert('One or more of your fields are still empty. Please fill it out.')
+        return
+      }
+    }
+  }
+
+
+  // On submit prevent webpage reload and check conditions
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    checkEmpty()
+    try {
+      const response = await fetch('http://flip4.engr.oregonstate.edu:4283/company', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+      if (response.ok) {
+        // Handle success
+        console.log('Company added successfully');
+        fetch('http://flip4.engr.oregonstate.edu:4283/company') 
+          .then(response => response.json())
+          .then(data => setCompanyData(data))
+          .catch(error => console.error('Error fetching data:', error));
+      }
+    } catch (error) {
+      console.error('Could not add company', error);
+    }
+  };
+
+
+  // The delete operation for the companies  table
+  const deleteCompanies = async (companyID) => {
+    try {
+      const response = await fetch(`http://flip4.engr.oregonstate.edu:4283/${companyID}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        console.log('Company deleted successfully');
+        fetch('http://flip4.engr.oregonstate.edu:4283/company') 
+          .then(response => response.json())
+          .then(data => setCompanyData(data))
+          .catch(error => console.error('Error fetching data:', error));
+      } 
+    } catch (error) {
+      console.error('Error deleting company:', error);
+    }
+  };
+
+return (
     <section>
       <Container fluid className="basic-info" id="student">
         <Container className="content">
-          <h1>Add Company </h1>
-          <Row>
-            <Col md={7}>
-              <Form className="form-box">
-                <Form.Group className="mb-2">
-                  <Form.Label> Company Name </Form.Label>
-                  <Form.Control type="text" placeholder="Name" />
-                </Form.Group>
-                <Form.Group className="mb-5">
-                  <Form.Label>Role</Form.Label>
-                  <Form.Control type="text" placeholder="Role in company" />
-                </Form.Group>
-                <Button variant="primary" type="submit">
-                  Add company
-                </Button>
-              </Form>
-            </Col>
-          </Row>
+          <button type="button" class="btn btn-dark" onClick={() => setForm(!form)}>
+            Add Company
+          </button>
+          {form && (
+            <>
+              <h1>Add Company </h1>
+              <Row>
+              <Col md={7}>
+                <Form className="form-box" onSubmit={handleSubmit}>
+                  Fields marked * are required
+                  <Form.Group className="mb-2" style={{ marginTop: "20px" }}>
+                    <Form.Label> Company Name* </Form.Label>
+                    <Form.Control type="text"
+                    name="companyName" 
+                    placeholder="Name" 
+                    value={formData.companyName}
+                    onChange={handleChange}
+                    />
+                    <Form.Text style={{ color: "whitesmoke" }}>
+                        Please enter company name.
+                    </Form.Text>
+                  </Form.Group>
+                  <Form.Group className="mb-5">
+                    <Form.Label>Role*</Form.Label>
+                    <Form.Control type="text" 
+                    placeholder="Role in company" 
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Button variant="primary" type="submit">
+                    Add company
+                  </Button>
+                </Form>
+              </Col>
+            </Row>
+            </>
+          )}
           <Table striped bordered hover style={{ marginTop: "20px" }}>
             <thead>
               <tr>
                 <th>companyID#</th>
                 <th>Name</th>
                 <th>Role</th>
+                <th>Delete</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>1</td>
-                <td>Google</td>
+              {companies.map(company => (<tr>
+                <td>{company.companyID}</td>
+                <td>{company.companyName}</td>
+                <td>{company.role}</td>
                 <td>
-                Frontend Software Engineer
+                  <Button variant="danger" type="submit" onClick={() => deleteCompanies(company.companyID)}>
+                    X
+                  </Button>
                 </td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>Datadog</td>
-                <td>
-                  Systems Engineer
-                </td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>IBM</td>
-                <td>
-                  Software Tester
-                </td>
-              </tr>
-              <tr>
-                <td>4</td>
-                <td>Youtube</td>
-                <td>
-                  Security Engineer
-                </td>
-              </tr>
+              </tr>))}
             </tbody>
           </Table>
         </Container>

@@ -102,6 +102,38 @@ app.get('/earning', (req, res) => {
   });
 });
 
+
+// Gets company data
+
+app.get('/company', (req, res) => {
+  const query = 'SELECT * FROM Companies'; 
+  pool.query(query, (err, results) => {
+      if (err) {
+        console.error('Error executing query:', err);
+        res.status(500).send('Error fetching data');
+        return;
+      }
+      res.json(results); 
+    });
+});
+
+
+// Get Instructor Data
+
+app.get('/instructor', (req, res) => {
+  const query = 'SELECT * FROM Instructors'; 
+  pool.query(query, (err, results) => {
+      if (err) {
+        console.error('Error executing query:', err);
+        res.status(500).send('Error fetching data');
+        return;
+      }
+      res.json(results); 
+    });
+});
+
+
+
 // Post routes
 app.post("/student", (req, res) => {
   console.log(req.body)
@@ -153,7 +185,65 @@ app.post("/earning", (req, res) => {
   });
 });
 
+// Add Instructor Data
 
+app.post("/instructor", (req, res) => {
+  console.log(req.body)
+  const { instructorID, instructorName, instructorEmail, instructorGender, instructorQualifications, yearsTaught } = req.body;
+  const q = `INSERT INTO Instructors (instructorID, instructorName, InstructorEmail, InstructorGender, instructorQualifications, yearsTaught) VALUES (?, ?, ?, ?, ?, ?)`;
+  const values = [instructorID, instructorName, instructorEmail, instructorGender, instructorQualifications, yearsTaught];
+  console.log(values)
+
+  pool.query(q, values, (err) => {
+      if (err) {
+        console.error('Error executing query:', err);
+        res.status(500).send('Error executing query');
+        return;
+      }
+      console.log('Instructor added successfully');
+      res.status(200).json({ message: 'Instructor added successfully' });
+  });
+});
+
+// Add company data
+
+app.post("/company", (req, res) => {
+  console.log(req.body)
+  const { companyID, companyName, role } = req.body;
+  const q = `INSERT INTO Companies (companyID, companyName, role) VALUES (?, ?, ?)`;
+  const values = [companyID, companyName, role];
+  console.log(values)
+
+  pool.query(q, values, (err) => {
+      if (err) {
+        console.error('Error executing query:', err);
+        res.status(500).send('Error executing query');
+        return;
+      }
+      console.log('Company added successfully');
+      res.status(200).json({ message: 'Company added successfully' });
+  });
+});
+
+// Add course data
+
+app.post("/course", (req, res) => {
+  console.log(req.body)
+  const { courseID, courseNumber, description, courseUnits, instructorID} = req.body;
+  const q = `INSERT INTO Courses (courseID, courseNumber, description, courseUnits, instructorID) VALUES (?, ?, ?, ?, ?)`;
+  const values = [courseID, courseNumber, description, courseUnits, instructorID];
+  console.log(values)
+
+  pool.query(q, values, (err) => {
+      if (err) {
+        console.error('Error executing query:', err);
+        res.status(500).send('Error executing query');
+        return;
+      }
+      console.log('Student added successfully');
+      res.status(200).json({ message: 'Student added successfully' });
+  });
+});
 
 
 /*
@@ -272,6 +362,64 @@ app.delete('/earning/:earningID', (req, res) => {
       return;
     }
     console.log('Earning deleted successfully');
+    res.sendStatus(204); // No content - deletion successful
+  });
+});
+
+
+// Delete Instructor
+
+app.delete('/instructor/:instructorID', (req, res) => {
+  const instructorID = req.params.instructorID;
+  const q = 'DELETE FROM Instructors WHERE instructorID = ?';
+  console.log(instructorID)
+
+  pool.query(q, [instructorID], (err) => {
+    if (err) {
+      console.error('Error deleting instructor:', err);
+      res.status(500).json({ error: 'Failed to delete instructor' });
+      return;
+    }
+    console.log('Instructor deleted successfully');
+    res.sendStatus(204); // No content - deletion successful
+  });
+});
+
+
+
+// Delete Company
+
+app.delete('/company/:companyID', (req, res) => {
+  const companyID = req.params.companyID;
+  const q = 'DELETE FROM Companies WHERE companyID = ?';
+  console.log(companyID)
+
+  pool.query(q, [companyID], (err) => {
+    if (err) {
+      console.error('Error deleting company:', err);
+      res.status(500).json({ error: 'Failed to delete company' });
+      return;
+    }
+    console.log('Company deleted successfully');
+    res.sendStatus(204); // No content - deletion successful
+  });
+});
+
+
+// Delete Course
+
+app.delete('/course/:courseID', (req, res) => {
+  const courseID = req.params.courseID;
+  const q = 'DELETE FROM Courses WHERE courseID = ?';
+  console.log(courseID)
+
+  pool.query(q, [courseID], (err) => {
+    if (err) {
+      console.error('Error deleting course:', err);
+      res.status(500).json({ error: 'Failed to delete course' });
+      return;
+    }
+    console.log('Courses deleted successfully');
     res.sendStatus(204); // No content - deletion successful
   });
 });
