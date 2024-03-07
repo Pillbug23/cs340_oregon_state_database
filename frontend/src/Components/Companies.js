@@ -45,9 +45,10 @@ function Companies() {
     for (const field in formData) {
       if (formData[field] === '') {
         alert('One or more of your fields are still empty. Please fill it out.')
-        return
+        return false
       }
     }
+    return true
   }
 
 
@@ -55,7 +56,9 @@ function Companies() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    checkEmpty()
+    if (!checkEmpty()) {
+      return
+    }
     try {
       const response = await fetch('http://flip4.engr.oregonstate.edu:4283/company', {
         method: 'POST',
@@ -81,7 +84,7 @@ function Companies() {
   // The delete operation for the companies  table
   const deleteCompanies = async (companyID) => {
     try {
-      const response = await fetch(`http://flip4.engr.oregonstate.edu:4283/${companyID}`, {
+      const response = await fetch(`http://flip4.engr.oregonstate.edu:4283/company/${companyID}`, {
         method: 'DELETE',
       });
       if (response.ok) {

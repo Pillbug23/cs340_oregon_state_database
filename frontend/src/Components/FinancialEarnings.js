@@ -41,24 +41,24 @@ function FinancialEarnings() {
   // Form data which is a useState object
   // Note some fields are set to the default values if not selected
   const [formData, setFormData] = useState({
-    prev: '1',
-    tuition: '1',
-    loan: '1',
-    misc: '1',
-    interest: '1',
+    prev: '',
+    tuition: '',
+    loan: '',
+    misc: '',
+    interest: '',
     studentID: '',
-    current: '1'
+    current: ''
   });
 
   const [updateFormData, setUpdateFormData] = useState({
     earningID: '',
-    prev: '1',
-    tuition: '1',
-    loan: '1',
-    misc: '1',
-    interest: '1',
+    prev: '',
+    tuition: '',
+    loan: '',
+    misc: '',
+    interest: '',
     studentID: '',
-    current: '1'
+    current: ''
   });
 
   const changeForms = (earning) => {
@@ -93,8 +93,7 @@ function FinancialEarnings() {
   // On submit prevent webpage reload and check conditions
   const handleSubmit = async (e) => {
     e.preventDefault();
-    checkEmpty()
-
+    
     try {
       const response = await fetch('http://flip4.engr.oregonstate.edu:4283/earning', {
         method: 'POST',
@@ -127,7 +126,6 @@ function FinancialEarnings() {
 
   const updateEarning = async (e) => {
     e.preventDefault();
-    checkEmptyUpdate()
 
     const earningID = updateFormData.earningID;
 
@@ -156,13 +154,13 @@ function FinancialEarnings() {
   const checkEmpty = () => {
     for (const field in formData) {
       if (formData[field] === '') {
-        console.log(formData[field])
         alert('One or more of your fields are still empty or you have a foreign key empty. Please fill it out.')
         return
       }
     }
   }
 
+  
   // Course function to find the following name of the student corresponding to ID;
   const getStudent = (studentid) => {
     // Iterates through all students checking if studentd matches form studentid
@@ -175,7 +173,7 @@ function FinancialEarnings() {
   const deleteEarning = async (earningID) => {
     setUpdateForm(false)
     setForm(false)
-    console.log(earningID)
+
     try {
       const response = await fetch(`http://flip4.engr.oregonstate.edu:4283/earning/${earningID}`, {
         method: 'DELETE',
@@ -202,8 +200,7 @@ function FinancialEarnings() {
           {form && (
             <>
               <h1>Add Financial Earnings </h1>
-              <h2>If Financial Information is not inputted will directly
-                assume a 1 dollar in each column.
+              <h2>* Fields are required
               </h2>
               <Row>
                 <Col md={7}>
@@ -274,7 +271,7 @@ function FinancialEarnings() {
                     </InputGroup>
 
                     <Form.Group className="mb-2">
-                      <Form.Label> StudentID </Form.Label>
+                      <Form.Label> StudentID * (SELECT from dropdown)</Form.Label>
                       <Form.Control
                         as="select"
                         placeholder="Enter StudentID Number"
@@ -282,12 +279,16 @@ function FinancialEarnings() {
                         value={formData.studentID}
                         onChange={handleChange}
                       >
+                        <option value=""></option>
                         {students.map(student => (
                           <option key={student.studentID} value={student.studentID}>
                             {student.studentID}
                           </option>
                         ))}
                       </Form.Control>
+                      <Form.Text style={{ color: "whitesmoke" }}>
+                        Click the input box to make the dropdown appear.
+                      </Form.Text>
                     </Form.Group>
 
                     <Form.Label>Current Salary</Form.Label>
@@ -396,7 +397,7 @@ function FinancialEarnings() {
                     </InputGroup>
 
                     <Form.Group className="mb-2">
-                      <Form.Label> StudentID </Form.Label>
+                      <Form.Label> StudentID* (SELECT from dropdown)</Form.Label>
                       <Form.Control
                         as="select"
                         placeholder="Enter StudentID Number"
@@ -404,12 +405,16 @@ function FinancialEarnings() {
                         value={updateFormData.studentID}
                         onChange={handleUpdateChange}
                       >
+                        <option value=""></option>
                         {students.map(student => (
                           <option key={student.studentID} value={student.studentID}>
                             {student.studentID}
                           </option>
                         ))}
                       </Form.Control>
+                      <Form.Text style={{ color: "whitesmoke" }}>
+                        Click the input box to make the dropdown appear.
+                      </Form.Text>
                     </Form.Group>
 
                     <Form.Label>Current Salary</Form.Label>

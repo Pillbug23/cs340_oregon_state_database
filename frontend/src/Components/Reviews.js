@@ -40,13 +40,13 @@ function Reviews() {
   // Note some fields are set to the default values if not selected
   const [formData, setFormData] = useState({
     courseid: '',
-    unit: '',
+    unit: '1',
     feedback: '',
   });
 
   const [updateFormData, setUpdateFormData] = useState({
     courseid: '',
-    unit: '',
+    unit: '1',
     feedback: '',
   });
 
@@ -91,9 +91,10 @@ function Reviews() {
     for (const field in formData) {
       if (formData[field] === '') {
         alert('One or more of your fields are still empty. Please fill it out.')
-        return
+        return false
       }
     }
+    return true
   }
 
   // Course function to find the following name of the course corresponding to ID;
@@ -115,7 +116,6 @@ function Reviews() {
   // On submit prevent webpage reload and check conditions
   const handleSubmit = async (e) => {
     e.preventDefault();
-    checkEmpty()
 
     try {
       const response = await fetch('http://flip4.engr.oregonstate.edu:4283/review', {
@@ -143,7 +143,6 @@ function Reviews() {
 
   const updateReview = async (e) => {
     e.preventDefault();
-    checkEmptyUpdate()
 
     const reviewID = updateFormData.reviewid;
 
@@ -202,7 +201,7 @@ function Reviews() {
                 <Col md={7}>
                   <Form className="form-box" onSubmit={handleSubmit}>
                     <Form.Group className="mb-2">
-                      <Form.Label> Course Number </Form.Label>
+                      <Form.Label> Course Number (Select from Dropdown) </Form.Label>
                       <Form.Control
                         as="select"
                         placeholder="Enter Course Number"
@@ -210,6 +209,7 @@ function Reviews() {
                         value={formData.courseid}
                         onChange={handleChange}
                       >
+                        <option value=""></option>
                         {courses.map(course => (
                           <option key={course.courseID} value={course.courseID}>
                             {course.courseID}:{course.courseName}
@@ -290,6 +290,7 @@ function Reviews() {
                         value={updateFormData.courseid}
                         onChange={handleUpdateChange}
                       >
+                        <option value=""></option>
                         {courses.map(course => (
                           <option key={course.courseID} value={course.courseID}>
                             {course.courseID}:{course.courseName}

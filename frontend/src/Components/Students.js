@@ -93,23 +93,32 @@ function Student() {
     for (const field in formData) {
       if (formData[field] === '') {
         alert('One or more of your fields are still empty. Please fill it out.')
-        return
+        return false
       }
     }
+    return true
   }
 
   const checkEmptyUpdate = () => {
     for (const field in updateFormData) {
       if (updateFormData[field] === '') {
         alert('One or more of your fields are still empty. Please fill it out.')
-        return
+        return false
       }
     }
+    return true
   }
+
   // On submit prevent webpage reload and check conditions
   const handleSubmit = async (e) => {
     e.preventDefault();
-    checkEmpty()
+    if (!checkEmpty()) {
+      return
+    }
+    if (formData.studentid.length !== 6) {
+      alert('Your student ID is not 6 digits.')
+      return
+    }
     if (!formData.email.endsWith("@oregonstate.edu")) {
       setEmailError(true)
       return
@@ -140,7 +149,9 @@ function Student() {
 
   const updateStudent = async (e) => {
     e.preventDefault();
-    checkEmptyUpdate()
+    if (!checkEmptyUpdate()) {
+      return
+    }
     if (!updateFormData.email.endsWith("@oregonstate.edu")) {
       setEmailError(true)
       return
@@ -232,7 +243,7 @@ function Student() {
                     </Form.Group>
                     {emailError && (<p>Email needs to end in @oregonstate.edu</p>)}
                     <Form.Group className="mb-2">
-                      <Form.Label>Gender*</Form.Label>
+                      <Form.Label>Gender</Form.Label>
                       <Form.Control
                         as="select"
                         name="gender"
@@ -249,6 +260,7 @@ function Student() {
                       <Form.Control as="select" placeholder="Company" name="company"
                         value={formData.company}
                         onChange={handleChange}>
+                        <option value=""></option>
                         {companies.map(company => (
                           <option key={company.companyID} value={company.companyID}>
                             {company.companyID}:{company.companyName}
@@ -317,7 +329,7 @@ function Student() {
                     </Form.Group>
                     {emailError && (<p>Email needs to end in @oregonstate.edu</p>)}
                     <Form.Group className="mb-2">
-                      <Form.Label>Gender*</Form.Label>
+                      <Form.Label>Gender</Form.Label>
                       <Form.Control
                         as="select"
                         name="gender"
@@ -334,10 +346,12 @@ function Student() {
                       <Form.Control as="select" placeholder="Company" name="company"
                         value={updateFormData.company}
                         onChange={handleUpdateChange}>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
+                        <option value=""></option>
+                        {companies.map(company => (
+                          <option key={company.companyID} value={company.companyID}>
+                            {company.companyID}:{company.companyName}
+                          </option>
+                        ))}
                       </Form.Control>
                     </Form.Group>
                     <Form.Group className="mb-2">

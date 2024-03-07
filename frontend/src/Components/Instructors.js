@@ -32,7 +32,7 @@ function Instructors() {
   const [formData, setFormData] = useState({
     instructorName: '',
     instructorEmail: '',
-    instructorGender: '',
+    instructorGender: 'M',
     instructorQualifications: '',
     yearsTaught: '',
   });
@@ -51,18 +51,24 @@ function Instructors() {
   // Check if any of the fields are empty
   const checkEmpty = () => {
     for (const field in formData) {
+      if (field === 'yearsTaught') {
+        return true
+      }
       if (formData[field] === '') {
         alert('One or more of your fields are still empty. Please fill it out.')
-        return
+        return false
       }
     }
+    return true
   }
 
  
   // On submit prevent webpage reload and check conditions
   const handleSubmit = async (e) => {
     e.preventDefault();
-    checkEmpty()
+    if (!checkEmpty()) {
+      return
+    }
     try {
       const response = await fetch('http://flip4.engr.oregonstate.edu:4283/instructor', {
         method: 'POST',
@@ -114,20 +120,21 @@ function Instructors() {
               <Row>
               <Col md={7}>
               <Form className="form-box" onSubmit={handleSubmit}>
+              Fields marked * are required
                   <Form.Group className="mb-2">
-                          <Form.Label>Name</Form.Label>
+                          <Form.Label>Name*</Form.Label>
                           <Form.Control type="text" placeholder="Name" name="instructorName"
                             value={formData.instructorName}
                             onChange={handleChange} />
                   </Form.Group>
                   <Form.Group className="mb-2">
-                          <Form.Label>Email</Form.Label>
+                          <Form.Label>Email*</Form.Label>
                           <Form.Control type="text" placeholder="Email" name="instructorEmail"
                             value={formData.instructorEmail}
                             onChange={handleChange} />
                   </Form.Group>
                   <Form.Group className="mb-2">
-                          <Form.Label>Gender</Form.Label>
+                          <Form.Label>Gender*</Form.Label>
                           <Form.Control
                             as="select"
                             name="instructorGender"
@@ -140,7 +147,7 @@ function Instructors() {
                           </Form.Control>
                   </Form.Group>
                   <Form.Group className="mb-5">
-                        <Form.Label>Qualifications</Form.Label>
+                        <Form.Label>Qualifications*</Form.Label>
                         <Form.Control as="textarea" rows="3"
                         placeholder="Qualifications" 
                         name="instructorQualifications"
@@ -174,7 +181,6 @@ function Instructors() {
                   <th>Gender</th>
                   <th>Qualifications</th>
                   <th>Years Taught</th>
-                  <th>Delete</th>
                 </tr>
               </thead>
             <tbody>
@@ -185,11 +191,6 @@ function Instructors() {
                   <td>{instructor.instructorGender}</td>
                   <td>{instructor.instructorQualifications}</td>
                   <td>{instructor.yearsTaught}</td>
-                  <td>
-                    <Button variant="danger" type="submit" onClick={() => deleteInstructor(instructor.instructorID)}>
-                      X
-                    </Button>
-                  </td>
                 </tr>))}
               </tbody>
           </Table>

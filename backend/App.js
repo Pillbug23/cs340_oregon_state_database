@@ -189,9 +189,9 @@ app.post("/earning", (req, res) => {
 
 app.post("/instructor", (req, res) => {
   console.log(req.body)
-  const { instructorID, instructorName, instructorEmail, instructorGender, instructorQualifications, yearsTaught } = req.body;
-  const q = `INSERT INTO Instructors (instructorID, instructorName, InstructorEmail, InstructorGender, instructorQualifications, yearsTaught) VALUES (?, ?, ?, ?, ?, ?)`;
-  const values = [instructorID, instructorName, instructorEmail, instructorGender, instructorQualifications, yearsTaught];
+  const { instructorName, instructorEmail, instructorGender, instructorQualifications, yearsTaught } = req.body;
+  const q = `INSERT INTO Instructors (instructorName, instructorEmail, instructorGender, instructorQualifications, yearsTaught) VALUES (?, ?, ?, ?, ?)`;
+  const values = [instructorName, instructorEmail, instructorGender, instructorQualifications, yearsTaught];
   console.log(values)
 
   pool.query(q, values, (err) => {
@@ -208,7 +208,6 @@ app.post("/instructor", (req, res) => {
 // Add company data
 
 app.post("/company", (req, res) => {
-  console.log(req.body)
   const { companyID, companyName, role } = req.body;
   const q = `INSERT INTO Companies (companyID, companyName, role) VALUES (?, ?, ?)`;
   const values = [companyID, companyName, role];
@@ -228,11 +227,9 @@ app.post("/company", (req, res) => {
 // Add course data
 
 app.post("/course", (req, res) => {
-  console.log(req.body)
-  const { courseID, courseNumber, description, courseUnits, instructorID} = req.body;
-  const q = `INSERT INTO Courses (courseID, courseNumber, description, courseUnits, instructorID) VALUES (?, ?, ?, ?, ?)`;
-  const values = [courseID, courseNumber, description, courseUnits, instructorID];
-  console.log(values)
+  const { courseID, courseName, description, courseUnits, instructorID} = req.body;
+  const q = `INSERT INTO Courses (courseID, courseName, description, courseUnits, instructorID) VALUES (?, ?, ?, ?, ?)`;
+  const values = [courseID, courseName, description, courseUnits, instructorID];
 
   pool.query(q, values, (err) => {
       if (err) {
