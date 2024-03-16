@@ -1,5 +1,16 @@
 # Database Tracker CS340 | Oregon State Database Tracker
 
+# Sources (Listed by Language)
+JS-based citations:<br>
+
+Citation for the React-Bootstrap library:<br>
+Date: 2/14/2023<br>
+Based on React-Bootstrap library for styling, easier component building:<br>
+The following components were imported: Container,Row,Col,Form,Nav,Navbar,Button<br>
+Source URL: https://react-bootstrap.github.io/<br>
+
+
+
 # 🛠 Installation and Setup
 Create a folder on your User.
 * mkdir example-folder 
@@ -29,6 +40,7 @@ Runs the app in the development mode.
 
 # 💡 Features
 📖 Multi-Page Layout/Navigation
+
 🖌️ Styled with React-Bootstrap
 
 
@@ -39,6 +51,3 @@ To view and enter your SQL database, navigate to the backend folder, and go to t
 
 You can edit your information or change what you need accordingly.
 
-# Sources (Listed by Language)
-JS citations:
-https://react-bootstrap.github.io/ 
