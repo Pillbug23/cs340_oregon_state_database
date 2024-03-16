@@ -8,12 +8,20 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
 
+/*
+Citation for the following react library:
+Date: 2/14/2023
+Based on React-Bootstrap library for styling, easier component building:
+The following components were imported: Container,Row,Col,Form,Nav,Navbar,Button
+Source URL: https://react-bootstrap.github.io/
+*/
+
 function Companies() {
 
   const [form, setForm] = useState(false);
   // The Company data which is pulled for the backend 
   const [companies, setCompanyData] = useState([]);
- 
+
 
   // Side effect for loading component after each render
   // Data is loaded once on load 
@@ -28,7 +36,7 @@ function Companies() {
   // Note some fields are set to the default values if not selected
   const [formData, setFormData] = useState({
     companyName: '',
-    role: '', 
+    role: '',
   });
 
 
@@ -70,7 +78,7 @@ function Companies() {
       if (response.ok) {
         // Handle success
         console.log('Company added successfully');
-        fetch('http://flip4.engr.oregonstate.edu:4283/company') 
+        fetch('http://flip4.engr.oregonstate.edu:4283/company')
           .then(response => response.json())
           .then(data => setCompanyData(data))
           .catch(error => console.error('Error fetching data:', error));
@@ -81,25 +89,8 @@ function Companies() {
   };
 
 
-  // The delete operation for the companies  table
-  const deleteCompanies = async (companyID) => {
-    try {
-      const response = await fetch(`http://flip4.engr.oregonstate.edu:4283/company/${companyID}`, {
-        method: 'DELETE',
-      });
-      if (response.ok) {
-        console.log('Company deleted successfully');
-        fetch('http://flip4.engr.oregonstate.edu:4283/company') 
-          .then(response => response.json())
-          .then(data => setCompanyData(data))
-          .catch(error => console.error('Error fetching data:', error));
-      } 
-    } catch (error) {
-      console.error('Error deleting company:', error);
-    }
-  };
 
-return (
+  return (
     <section>
       <Container fluid className="basic-info" id="student">
         <Container className="content">
@@ -110,36 +101,36 @@ return (
             <>
               <h1>Add Company </h1>
               <Row>
-              <Col md={7}>
-                <Form className="form-box" onSubmit={handleSubmit}>
-                  Fields marked * are required
-                  <Form.Group className="mb-2" style={{ marginTop: "20px" }}>
-                    <Form.Label> Company Name* </Form.Label>
-                    <Form.Control type="text"
-                    name="companyName" 
-                    placeholder="Name" 
-                    value={formData.companyName}
-                    onChange={handleChange}
-                    />
-                    <Form.Text style={{ color: "whitesmoke" }}>
+                <Col md={7}>
+                  <Form className="form-box" onSubmit={handleSubmit}>
+                    Fields marked * are required
+                    <Form.Group className="mb-2" style={{ marginTop: "20px" }}>
+                      <Form.Label> Company Name* </Form.Label>
+                      <Form.Control type="text"
+                        name="companyName"
+                        placeholder="Name"
+                        value={formData.companyName}
+                        onChange={handleChange}
+                      />
+                      <Form.Text style={{ color: "whitesmoke" }}>
                         Please enter company name.
-                    </Form.Text>
-                  </Form.Group>
-                  <Form.Group className="mb-5">
-                    <Form.Label>Role*</Form.Label>
-                    <Form.Control type="text" 
-                    placeholder="Role in company" 
-                    name="role"
-                    value={formData.role}
-                    onChange={handleChange} 
-                    />
-                  </Form.Group>
-                  <Button variant="primary" type="submit">
-                    Add company
-                  </Button>
-                </Form>
-              </Col>
-            </Row>
+                      </Form.Text>
+                    </Form.Group>
+                    <Form.Group className="mb-5">
+                      <Form.Label>Role*</Form.Label>
+                      <Form.Control type="text"
+                        placeholder="Role in company"
+                        name="role"
+                        value={formData.role}
+                        onChange={handleChange}
+                      />
+                    </Form.Group>
+                    <Button variant="primary" type="submit">
+                      Add company
+                    </Button>
+                  </Form>
+                </Col>
+              </Row>
             </>
           )}
           <Table striped bordered hover style={{ marginTop: "20px" }}>
@@ -148,7 +139,6 @@ return (
                 <th>companyID#</th>
                 <th>Name</th>
                 <th>Role</th>
-                <th>Delete</th>
               </tr>
             </thead>
             <tbody>
@@ -156,11 +146,6 @@ return (
                 <td>{company.companyID}</td>
                 <td>{company.companyName}</td>
                 <td>{company.role}</td>
-                <td>
-                  <Button variant="danger" type="submit" onClick={() => deleteCompanies(company.companyID)}>
-                    X
-                  </Button>
-                </td>
               </tr>))}
             </tbody>
           </Table>

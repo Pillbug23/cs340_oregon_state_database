@@ -8,17 +8,22 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
 import InputGroup from 'react-bootstrap/InputGroup';
-import { getOverlayDirection } from "react-bootstrap/esm/helpers";
+
+/*
+Citation for the following react library:
+Date: 2/14/2023
+Based on React-Bootstrap library for styling, easier component building:
+The following components were imported: Container,Row,Col,Form,Nav,Navbar,Button
+Source URL: https://react-bootstrap.github.io/
+*/
 
 function FinancialEarnings() {
   const [form, setForm] = useState(false);
   const [updateform, setUpdateForm] = useState(false);
-  // The review data which is pulled for the backend 
+  // The earning data which is pulled for the backend 
   const [earnings, setEarningData] = useState([]);
-  // The review data which is pulled for the backend 
+  // The student data which is pulled for the backend 
   const [students, setStudentData] = useState([]);
-  // The email error which is a boolean state
-  const [emailError, setEmailError] = useState(false)
 
   // Side effect for loading component after each render
   // Data is loaded once on load 
@@ -93,7 +98,7 @@ function FinancialEarnings() {
   // On submit prevent webpage reload and check conditions
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       const response = await fetch('http://flip4.engr.oregonstate.edu:4283/earning', {
         method: 'POST',
@@ -150,17 +155,6 @@ function FinancialEarnings() {
     }
   };
 
-  // Check if any of the fields are empty
-  const checkEmpty = () => {
-    for (const field in formData) {
-      if (formData[field] === '') {
-        alert('One or more of your fields are still empty or you have a foreign key empty. Please fill it out.')
-        return
-      }
-    }
-  }
-
-  
   // Course function to find the following name of the student corresponding to ID;
   const getStudent = (studentid) => {
     // Iterates through all students checking if studentd matches form studentid
@@ -206,7 +200,7 @@ function FinancialEarnings() {
                 <Col md={7}>
                   <Form className="form-box" onSubmit={handleSubmit}>
                     <Form.Label>Previous Salary</Form.Label>
-                    <InputGroup className="mb-3">
+                    <InputGroup className="mb-2">
                       <InputGroup.Text>$</InputGroup.Text>
                       <Form.Control
                         placeholder="Enter Dollar Amount"
@@ -215,13 +209,11 @@ function FinancialEarnings() {
                         onChange={handleChange}
                         aria-label="Amount (to the nearest dollar)"
                       />
-                      <InputGroup.Text>.00</InputGroup.Text>
-                      <Form.Text style={{ color: "whitesmoke" }}>
-                        What was your previous salary before enrolling in OSU if
-                        possible?
-                      </Form.Text>
                     </InputGroup>
-
+                    <Form.Text style={{ color: "whitesmoke" }}>
+                      What was your previous salary before enrolling in OSU if
+                      possible?
+                    </Form.Text>
                     <Form.Label>Tuition Cost</Form.Label>
                     <InputGroup className="mb-3">
                       <InputGroup.Text>$</InputGroup.Text>
@@ -231,7 +223,6 @@ function FinancialEarnings() {
                         value={formData.tuition}
                         onChange={handleChange}
                       />
-                      <InputGroup.Text>.00</InputGroup.Text>
                     </InputGroup>
 
                     <Form.Label>Student Total Loans</Form.Label>
@@ -243,7 +234,6 @@ function FinancialEarnings() {
                         value={formData.loan}
                         onChange={handleChange}
                       />
-                      <InputGroup.Text>.00</InputGroup.Text>
                     </InputGroup>
 
                     <Form.Label>Misc. Expenses</Form.Label>
@@ -255,7 +245,6 @@ function FinancialEarnings() {
                         value={formData.misc}
                         onChange={handleChange}
                       />
-                      <InputGroup.Text>.00</InputGroup.Text>
                     </InputGroup>
 
                     <Form.Label>Loan Interest</Form.Label>
@@ -267,7 +256,6 @@ function FinancialEarnings() {
                         value={formData.interest}
                         onChange={handleChange}
                       />
-                      <InputGroup.Text>%</InputGroup.Text>
                     </InputGroup>
 
                     <Form.Group className="mb-2">
@@ -300,7 +288,6 @@ function FinancialEarnings() {
                         value={formData.current}
                         onChange={handleChange}
                       />
-                      <InputGroup.Text>.00</InputGroup.Text>
                       <Form.Text style={{ color: "whitesmoke" }}>
                         What is your new salary after or currently enrolling in OSU if
                         possible?
@@ -321,18 +308,13 @@ function FinancialEarnings() {
               <Row>
                 <Col md={7}>
                   <Form className="form-box" onSubmit={updateEarning}>
-                  <Form.Group className="mb-2">
-                      <Form.Label>EarningID</Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Enter Earning ID"
-                        name="earningID"
-                        value={updateFormData.earningID}
-                        onChange={handleUpdateChange}
-                      />
+                    <Form.Group className="mb-2">
+                      <Form.Text style={{ color: "whitesmoke" }}>
+                        The earningID you selected was: {updateFormData.earningID}
+                      </Form.Text>
                     </Form.Group>
                     <Form.Label>Previous Salary</Form.Label>
-                    <InputGroup className="mb-3">
+                    <InputGroup className="mb-2">
                       <InputGroup.Text>$</InputGroup.Text>
                       <Form.Control
                         placeholder="Enter Dollar Amount"
@@ -341,13 +323,12 @@ function FinancialEarnings() {
                         onChange={handleUpdateChange}
                         aria-label="Amount (to the nearest dollar)"
                       />
-                      <InputGroup.Text>.00</InputGroup.Text>
-                      <Form.Text style={{ color: "whitesmoke" }}>
-                        What was your previous salary before enrolling in OSU if
-                        possible?
-                      </Form.Text>
-                    </InputGroup>
 
+                    </InputGroup>
+                    <Form.Text style={{ color: "whitesmoke" }}>
+                      What was your previous salary before enrolling in OSU if
+                      possible?
+                    </Form.Text>
                     <Form.Label>Tuition Cost</Form.Label>
                     <InputGroup className="mb-3">
                       <InputGroup.Text>$</InputGroup.Text>
@@ -357,7 +338,6 @@ function FinancialEarnings() {
                         value={updateFormData.tuition}
                         onChange={handleUpdateChange}
                       />
-                      <InputGroup.Text>.00</InputGroup.Text>
                     </InputGroup>
 
                     <Form.Label>Student Total Loans</Form.Label>
@@ -369,7 +349,6 @@ function FinancialEarnings() {
                         value={updateFormData.loan}
                         onChange={handleUpdateChange}
                       />
-                      <InputGroup.Text>.00</InputGroup.Text>
                     </InputGroup>
 
                     <Form.Label>Misc. Expenses</Form.Label>
@@ -381,7 +360,6 @@ function FinancialEarnings() {
                         value={updateFormData.misc}
                         onChange={handleUpdateChange}
                       />
-                      <InputGroup.Text>.00</InputGroup.Text>
                     </InputGroup>
 
                     <Form.Label>Loan Interest</Form.Label>
@@ -426,7 +404,6 @@ function FinancialEarnings() {
                         value={updateFormData.current}
                         onChange={handleUpdateChange}
                       />
-                      <InputGroup.Text>.00</InputGroup.Text>
                       <Form.Text style={{ color: "whitesmoke" }}>
                         What is your new salary after or currently enrolling in OSU if
                         possible?
@@ -451,7 +428,7 @@ function FinancialEarnings() {
                 <th>Loan Interest</th>
                 <th>Student ID</th>
                 <th>Current Salary</th>
-                <th>Add</th>
+                <th>Update</th>
                 <th>Delete</th>
               </tr>
             </thead>
@@ -459,13 +436,13 @@ function FinancialEarnings() {
               {earnings.map(earning => (
                 <tr>
                   <td>{earning.earningsID}</td>
-                  <td>${earning.priorSalary}.00</td>
-                  <td>${earning.tuitionCost}.00</td>
-                  <td>${earning.studentLoan}.00</td>
-                  <td>${earning.miscExpense}.00</td>
+                  <td>${earning.priorSalary}</td>
+                  <td>${earning.tuitionCost}</td>
+                  <td>${earning.studentLoan}</td>
+                  <td>${earning.miscExpense}</td>
                   <td>{earning.loanInterest}%</td>
                   <td>{getStudent(earning.studentID)}</td>
-                  <td>${earning.newSalary}.00</td>
+                  <td>${earning.newSalary}</td>
                   <td>
                     <Button
                       variant="primary"

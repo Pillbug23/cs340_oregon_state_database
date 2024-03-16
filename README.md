@@ -1,4 +1,4 @@
-# Database Tracker CS340 | Oregon State Database Tracker(some flip server)
+# Database Tracker CS340 | Oregon State Database Tracker
 
 # 🛠 Installation and Setup
 Create a folder on your User.
@@ -33,9 +33,12 @@ Runs the app in the development mode.
 
 
 # Usage
-To view or edit components, navigate to the directory /src/components. 
+To view or edit components, navigate to the frontend folder, go to directory /src/components, and view all the components.
+
+To view and enter your SQL database, navigate to the backend folder, and go to the /database folder to view the db-connector.js file. Enter your login information. You can view the routes in the App.js file.
 
 You can edit your information or change what you need accordingly.
 
-# Sources
+# Sources (Listed by Language)
+JS citations:
 https://react-bootstrap.github.io/ 

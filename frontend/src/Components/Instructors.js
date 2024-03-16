@@ -8,6 +8,21 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
 
+/*
+Citation for the following react library:
+Date: 2/14/2023
+Based on React-Bootstrap library for styling, easier component building:
+The following components were imported: Container,Row,Col,Form,Nav,Navbar,Button
+Source URL: https://react-bootstrap.github.io/
+*/
+
+/*
+Citation for the following JavaScript email checker:
+Date: 2/14/2023
+An endsWith method that checks whether or not the email ends with the specific .edu
+Source URL: https://www.w3schools.com/Jsref/jsref_endswith.asp#:~:text=JavaScript%20String%20endsWith%20%28%29%201%20Description%20The%20endsWith,endsWith%20%28%29%20is%20an%20ECMAScript6%20%28ES6%29%20feature.%20
+*/
+
 function Instructors() {
   // The form state which decides which form is filled out.
   // For example clicking on add makes form 1, update makes form 2.
@@ -64,6 +79,7 @@ function Instructors() {
 
  
   // On submit prevent webpage reload and check conditions
+  // Conditions whether or not fields are empty
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!checkEmpty()) {
@@ -87,23 +103,6 @@ function Instructors() {
       }
     } catch (error) {
       console.error('Could not add instructor', error);
-    }
-  };
-
-  const deleteInstructor = async (instructorID) => {
-    try {
-      const response = await fetch(`http://flip4.engr.oregonstate.edu:4283/instructor/${instructorID}`, {
-        method: 'DELETE',
-      });
-      if (response.ok) {
-        console.log('Instructor deleted successfully');
-        fetch('http://flip4.engr.oregonstate.edu:4283/instructor') 
-          .then(response => response.json())
-          .then(data => setInstructorData(data))
-          .catch(error => console.error('Error fetching data:', error));
-      } 
-    } catch (error) {
-      console.error('Error deleting instructor:', error);
     }
   };
   

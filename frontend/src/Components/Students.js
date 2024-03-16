@@ -8,9 +8,23 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
 
+/*
+Citation for the following react library:
+Date: 2/14/2023
+Based on React-Bootstrap library for styling, easier component building:
+The following components were imported: Container,Row,Col,Form,Nav,Navbar,Button
+Source URL: https://react-bootstrap.github.io/
+*/
+
+/*
+Citation for the following JavaScript email checker:
+Date: 2/14/2023
+An endsWith method that checks whether or not the email ends with the specific .edu
+Source URL: https://www.w3schools.com/Jsref/jsref_endswith.asp#:~:text=JavaScript%20String%20endsWith%20%28%29%201%20Description%20The%20endsWith,endsWith%20%28%29%20is%20an%20ECMAScript6%20%28ES6%29%20feature.%20
+*/
+
 function Student() {
   // The form state which decides which form is filled out.
-  // For example clicking on add makes form 1, update makes form 2.
   const [form, setForm] = useState(false);
   const [updateform, setUpdateForm] = useState(false);
   // The student data which is pulled for the backend 
@@ -50,6 +64,7 @@ function Student() {
     graduated: 'No'
   });
 
+  // Update form to update form information once button is clicked
   const [updateFormData, setUpdateFormData] = useState({
     studentid: '',
     name: '',
@@ -60,6 +75,7 @@ function Student() {
     graduated: 'No'
   });
 
+  // Display form function to change the closing and opening of forms
   const changeForms = (student) => {
     setForm(false)
     setUpdateForm(!updateform)
@@ -119,6 +135,7 @@ function Student() {
       alert('Your student ID is not 6 digits.')
       return
     }
+    // Checks if the email ends with @oregonstate.edu
     if (!formData.email.endsWith("@oregonstate.edu")) {
       setEmailError(true)
       return
@@ -146,7 +163,6 @@ function Student() {
 
 
   // Update the student table
-
   const updateStudent = async (e) => {
     e.preventDefault();
     if (!checkEmptyUpdate()) {

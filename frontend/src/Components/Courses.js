@@ -8,6 +8,14 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
 
+/*
+Citation for the following react library:
+Date: 2/14/2023
+Based on React-Bootstrap library for styling, easier component building:
+The following components were imported: Container,Row,Col,Form,Nav,Navbar,Button
+Source URL: https://react-bootstrap.github.io/
+*/
+
 function Courses() {
   // The form state which decides which form is filled out.
   // For example clicking on add makes form 1, update makes form 2.

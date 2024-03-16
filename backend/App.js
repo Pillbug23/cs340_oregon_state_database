@@ -1,6 +1,19 @@
-// App.js
 /*
-    SETUP
+Citation for the following CORS policy:
+Date: 2/14/2023
+Using Node.js requires a CORS policy to send data between frontend/backend to be read
+Source URL: https://stackoverflow.com/questions/43150051/how-to-enable-cors-nodejs-with-express
+*/
+
+/*
+Citation for the basic starter code setup for backend:
+Date: 2/14/2023
+Basic backend setup using Michael Curry's example code in Week 1: Activity 2
+Source URL: https://canvas.oregonstate.edu/courses/1946034/modules
+*/
+
+/*
+SETUP
 */
 var mysql = require('mysql')
 
@@ -33,6 +46,7 @@ app.use(cors())
 /*
 ROUTES
 */
+
 
 /*
 GET ROUTES
@@ -102,41 +116,52 @@ app.get('/earning', (req, res) => {
   });
 });
 
-
 // Gets company data
-
 app.get('/company', (req, res) => {
-  const query = 'SELECT * FROM Companies'; 
+  const query = 'SELECT * FROM Companies';
   pool.query(query, (err, results) => {
-      if (err) {
-        console.error('Error executing query:', err);
-        res.status(500).send('Error fetching data');
-        return;
-      }
-      res.json(results); 
-    });
+    if (err) {
+      console.error('Error executing query:', err);
+      res.status(500).send('Error fetching data');
+      return;
+    }
+    res.json(results);
+  });
 });
-
 
 // Get Instructor Data
-
 app.get('/instructor', (req, res) => {
-  const query = 'SELECT * FROM Instructors'; 
+  const query = 'SELECT * FROM Instructors';
   pool.query(query, (err, results) => {
-      if (err) {
-        console.error('Error executing query:', err);
-        res.status(500).send('Error fetching data');
-        return;
-      }
-      res.json(results); 
-    });
+    if (err) {
+      console.error('Error executing query:', err);
+      res.status(500).send('Error fetching data');
+      return;
+    }
+    res.json(results);
+  });
+});
+
+// Get enrollment Data
+app.get('/enrollment', (req, res) => {
+  const query = 'SELECT * FROM Enrollments';
+  pool.query(query, (err, results) => {
+    if (err) {
+      console.error('Error executing query:', err);
+      res.status(500).send('Error fetching data');
+      return;
+    }
+    res.json(results);
+  });
 });
 
 
 
-// Post routes
+/*
+Post routes
+*/
+// Add a student
 app.post("/student", (req, res) => {
-  console.log(req.body)
   const { studentid, name, email, gender, company, previousMajor, graduated } = req.body;
   const q = `INSERT INTO Students (studentID, studentName, studentEmail, studentGender, companyID, previousMajor, graduated) VALUES (?, ?, ?, ?, ?, ?, ?)`;
   const values = [studentid, name, email, gender, company, previousMajor, graduated];
@@ -152,6 +177,7 @@ app.post("/student", (req, res) => {
   });
 });
 
+// Add a review
 app.post("/review", (req, res) => {
   const { courseid, unit, feedback } = req.body;
   const q = `INSERT INTO Reviews (courseID, courseRating, courseReview) VALUES (?, ?, ?)`;
@@ -163,17 +189,17 @@ app.post("/review", (req, res) => {
       res.status(500).send('Error executing query');
       return;
     }
-    console.log('Student added successfully');
-    res.status(200).json({ message: 'Student added successfully' });
+    console.log('Review added successfully');
+    res.status(200).json({ message: 'Review added successfully' });
   });
 });
 
+// Add an earning
 app.post("/earning", (req, res) => {
   const { prev, tuition, loan, misc, interest, studentID, current } = req.body;
   const q = `INSERT INTO FinancialEarnings (priorSalary, tuitionCost, studentLoan,
     miscExpense,loanInterest,studentID, newSalary) VALUES (?, ?, ?, ? ,? ,? ,?)`;
   const values = [prev, tuition, loan, misc, interest, studentID, current];
-  console.log(studentID)
   pool.query(q, values, (err) => {
     if (err) {
       console.error('Error executing query:', err);
@@ -186,61 +212,74 @@ app.post("/earning", (req, res) => {
 });
 
 // Add Instructor Data
-
 app.post("/instructor", (req, res) => {
-  console.log(req.body)
   const { instructorName, instructorEmail, instructorGender, instructorQualifications, yearsTaught } = req.body;
   const q = `INSERT INTO Instructors (instructorName, instructorEmail, instructorGender, instructorQualifications, yearsTaught) VALUES (?, ?, ?, ?, ?)`;
   const values = [instructorName, instructorEmail, instructorGender, instructorQualifications, yearsTaught];
-  console.log(values)
 
   pool.query(q, values, (err) => {
-      if (err) {
-        console.error('Error executing query:', err);
-        res.status(500).send('Error executing query');
-        return;
-      }
-      console.log('Instructor added successfully');
-      res.status(200).json({ message: 'Instructor added successfully' });
+    if (err) {
+      console.error('Error executing query:', err);
+      res.status(500).send('Error executing query');
+      return;
+    }
+    console.log('Instructor added successfully');
+    res.status(200).json({ message: 'Instructor added successfully' });
   });
 });
 
 // Add company data
-
 app.post("/company", (req, res) => {
   const { companyID, companyName, role } = req.body;
   const q = `INSERT INTO Companies (companyID, companyName, role) VALUES (?, ?, ?)`;
   const values = [companyID, companyName, role];
-  console.log(values)
 
   pool.query(q, values, (err) => {
-      if (err) {
-        console.error('Error executing query:', err);
-        res.status(500).send('Error executing query');
-        return;
-      }
-      console.log('Company added successfully');
-      res.status(200).json({ message: 'Company added successfully' });
+    if (err) {
+      console.error('Error executing query:', err);
+      res.status(500).send('Error executing query');
+      return;
+    }
+    console.log('Company added successfully');
+    res.status(200).json({ message: 'Company added successfully' });
   });
 });
 
 // Add course data
-
 app.post("/course", (req, res) => {
-  const { courseID, courseName, description, courseUnits, instructorID} = req.body;
+  const { courseID, courseName, description, courseUnits, instructorID } = req.body;
   const q = `INSERT INTO Courses (courseID, courseName, description, courseUnits, instructorID) VALUES (?, ?, ?, ?, ?)`;
   const values = [courseID, courseName, description, courseUnits, instructorID];
 
   pool.query(q, values, (err) => {
-      if (err) {
-        console.error('Error executing query:', err);
-        res.status(500).send('Error executing query');
-        return;
-      }
-      console.log('Student added successfully');
-      res.status(200).json({ message: 'Student added successfully' });
+    if (err) {
+      console.error('Error executing query:', err);
+      res.status(500).send('Error executing query');
+      return;
+    }
+    console.log('Course added successfully');
+    res.status(200).json({ message: 'course added successfully' });
   });
 });
+
+// Add enrollment data
+app.post("/enrollment", (req, res) => {
+  const { studentid, courseid } = req.body;
+  const q = `INSERT INTO Enrollments (studentID, courseID) VALUES (?, ?)`;
+  const values = [studentid, courseid];
+
+  pool.query(q, values, (err) => {
+    if (err) {
+      console.error('Error executing query:', err);
+      res.status(500).send('Error executing query');
+      return;
+    }
+    console.log('Enrollment added successfully');
+    res.status(200).json({ message: 'Enrollment added successfully' });
+  });
+});
+
+
 
 
 /*
@@ -269,6 +308,7 @@ app.put("/student/:studentID", (req, res) => {
   });
 });
 
+// Update review
 app.put("/review/:reviewID", (req, res) => {
   const { courseid, unit, feedback } = req.body;
   const reviewID = req.params.reviewID;
@@ -278,19 +318,20 @@ app.put("/review/:reviewID", (req, res) => {
 
   pool.query(q, [courseid, unit, feedback, converted_reviewID], (err, result) => {
     if (err) {
-      console.error('Error updating student:', err);
-      res.status(500).json({ error: 'Failed to update student' });
+      console.error('Error updating review:', err);
+      res.status(500).json({ error: 'Failed to update review' });
       return;
     }
     if (result.affectedRows === 0) {
-      res.status(404).send(`Could not locate student with studentID of ${studentID}.`);
+      res.status(404).send(`Could not locate review with reviewID of ${reviewID}.`);
       return;
     }
     console.log('Review updated successfully');
-    res.status(200).json({ message: 'Student updated successfully' });
+    res.status(200).json({ message: 'Review updated successfully' });
   });
 });
 
+// Update earning
 app.put("/earning/:earningID", (req, res) => {
   const { prev, tuition, loan, misc, interest, studentID, current } = req.body;
   const q = `UPDATE FinancialEarnings SET priorSalary = ?, tuitionCost = ?, studentLoan = ?,
@@ -299,7 +340,7 @@ app.put("/earning/:earningID", (req, res) => {
   const earningID = req.params.earningID;
   pool.query(q, [prev, tuition, loan, misc, interest, studentID, current, earningID], (err, result) => {
     if (err) {
-      
+
       console.error('Error updating earning:', err);
       res.status(500).json({ error: 'Failed to update earning' });
       return;
@@ -309,15 +350,42 @@ app.put("/earning/:earningID", (req, res) => {
       return;
     }
     console.log('Earning updated successfully');
-    
+
     res.status(200).json({ message: 'Earning updated successfully' });
   });
 });
 
+//Update enrollment
+app.put("/enrollment/:enrollmentID", (req, res) => {
+  const { studentid, courseid } = req.body;
+  const q = `UPDATE Enrollments SET studentID = ?, courseID = ? WHERE enrollmentID = ? `;
+
+  const enrollmentID = req.params.enrollmentID;
+  pool.query(q, [studentid, courseid, enrollmentID], (err, result) => {
+    if (err) {
+
+      console.error('Error updating enrollment:', err);
+      res.status(500).json({ error: 'Failed to update enrollment' });
+      return;
+    }
+    if (result.affectedRows === 0) {
+      res.status(404).send(`Could not locate enrollment.`);
+      return;
+    }
+    console.log('enrollment updated successfully');
+
+    res.status(200).json({ message: 'enrollment updated successfully' });
+  });
+});
+
+
+
+
 /*
 DELETE ROUTES
 */
-//Delete student//
+
+//Delete student
 app.delete('/student/:studentID', (req, res) => {
   const studentID = req.params.studentID;
   const q = 'DELETE FROM Students WHERE studentID = ?';
@@ -333,21 +401,23 @@ app.delete('/student/:studentID', (req, res) => {
   });
 });
 
+// Delete a review with the given reviewID
 app.delete('/review/:reviewID', (req, res) => {
   const reviewID = req.params.reviewID;
   const q = 'DELETE FROM Reviews WHERE reviewID = ?';
 
   pool.query(q, [reviewID], (err) => {
     if (err) {
-      console.error('Error deleting student:', err);
-      res.status(500).json({ error: 'Failed to delete student' });
+      console.error('Error deleting review:', err);
+      res.status(500).json({ error: 'Failed to delete review' });
       return;
     }
-    console.log('Student deleted successfully');
+    console.log('Review deleted successfully');
     res.sendStatus(204); // No content - deletion successful
   });
 });
 
+//Delete an earning with the given earningID
 app.delete('/earning/:earningID', (req, res) => {
   const earningID = req.params.earningID;
   const q = 'DELETE FROM FinancialEarnings WHERE earningsID = ?';
@@ -363,52 +433,10 @@ app.delete('/earning/:earningID', (req, res) => {
   });
 });
 
-
-// Delete Instructor
-
-app.delete('/instructor/:instructorID', (req, res) => {
-  const instructorID = req.params.instructorID;
-  const q = 'DELETE FROM Instructors WHERE instructorID = ?';
-  console.log(instructorID)
-
-  pool.query(q, [instructorID], (err) => {
-    if (err) {
-      console.error('Error deleting instructor:', err);
-      res.status(500).json({ error: 'Failed to delete instructor' });
-      return;
-    }
-    console.log('Instructor deleted successfully');
-    res.sendStatus(204); // No content - deletion successful
-  });
-});
-
-
-
-// Delete Company
-
-app.delete('/company/:companyID', (req, res) => {
-  const companyID = req.params.companyID;
-  const q = 'DELETE FROM Companies WHERE companyID = ?';
-  console.log(companyID)
-
-  pool.query(q, [companyID], (err) => {
-    if (err) {
-      console.error('Error deleting company:', err);
-      res.status(500).json({ error: 'Failed to delete company' });
-      return;
-    }
-    console.log('Company deleted successfully');
-    res.sendStatus(204); // No content - deletion successful
-  });
-});
-
-
 // Delete Course
-
 app.delete('/course/:courseID', (req, res) => {
   const courseID = req.params.courseID;
   const q = 'DELETE FROM Courses WHERE courseID = ?';
-  console.log(courseID)
 
   pool.query(q, [courseID], (err) => {
     if (err) {
@@ -421,6 +449,21 @@ app.delete('/course/:courseID', (req, res) => {
   });
 });
 
+// Delete Enrollment
+app.delete('/enrollment/:enrollmentID', (req, res) => {
+  const enrollmentID = req.params.enrollmentID;
+  const q = 'DELETE FROM Enrollments WHERE enrollmentID = ?';
+
+  pool.query(q, [enrollmentID], (err) => {
+    if (err) {
+      console.error('Error deleting enrollment:', err);
+      res.status(500).json({ error: 'Failed to delete enrollment' });
+      return;
+    }
+    console.log('Enrollment deleted successfully');
+    res.sendStatus(204); // No content - deletion successful
+  });
+});
 
 
 /*

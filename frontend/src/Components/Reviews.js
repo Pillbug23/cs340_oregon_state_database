@@ -8,6 +8,14 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
 
+/*
+Citation for the following react library:
+Date: 2/14/2023
+Based on React-Bootstrap library for styling, easier component building:
+The following components were imported: Container,Row,Col,Form,Nav,Navbar,Button
+Source URL: https://react-bootstrap.github.io/
+*/
+
 function Reviews() {
   const [form, setForm] = useState(false);
   const [updateform, setUpdateForm] = useState(false);
@@ -15,8 +23,6 @@ function Reviews() {
   const [reviews, setReviewData] = useState([]);
   // The review data which is pulled for the backend 
   const [courses, setCourseData] = useState([]);
-  // The email error which is a boolean state
-  const [emailError, setEmailError] = useState(false)
 
   // Side effect for loading component after each render
   // Data is loaded once on load 
@@ -105,14 +111,6 @@ function Reviews() {
     return course ? course.courseName : null;
   }
 
-  const checkEmptyUpdate = () => {
-    for (const field in updateFormData) {
-      if (updateFormData[field] === '') {
-        alert('One or more of your fields are still empty. Please fill it out.')
-        return
-      }
-    }
-  }
   // On submit prevent webpage reload and check conditions
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -139,8 +137,9 @@ function Reviews() {
   };
 
 
-  // Update the student table
-
+  // Update the review table
+  // The following method prevents window reload on submit
+  // And updates the id selected
   const updateReview = async (e) => {
     e.preventDefault();
 
@@ -167,7 +166,8 @@ function Reviews() {
     }
   };
 
-  // The delete operation for the following student table
+  // The delete operation for the following review table
+  // Deletes the entry with the given id and resets form views
   const deleteReview = async (reviewID) => {
     setUpdateForm(false)
     setForm(false)
@@ -269,18 +269,10 @@ function Reviews() {
                 <Col md={7}>
                   <Form className="form-box" onSubmit={updateReview}>
                     <Form.Group className="mb-2">
-                      <Form.Label> ReviewID </Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Enter Review ID"
-                        name="reviewid"
-                        value={updateFormData.reviewid}
-                        onChange={handleUpdateChange}
-                      />
                       <Form.Text style={{ color: "whitesmoke" }}>
-                      Please update the following reviewID information you selected.
-                    </Form.Text>
-                    </Form.Group>             
+                        The reviewID you selected was: {updateFormData.reviewid}
+                      </Form.Text>
+                    </Form.Group>
                     <Form.Group className="mb-2">
                       <Form.Label> Course Number </Form.Label>
                       <Form.Control
