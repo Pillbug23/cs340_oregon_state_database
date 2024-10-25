@@ -1,7 +1,7 @@
 # Database Tracker CS340 | Oregon State Database Tracker
 
 # Sources (Listed by Language)
-# JS-based citations:<br>
+
 Citation for the React-Bootstrap library:<br>
 Date: 2/14/2023<br>
 Based on React-Bootstrap library for styling, easier component building:<br>
